@@ -1,0 +1,884 @@
+\documentclass[11pt,a4paper]{article}
+
+% ── Packages ──────────────────────────────────────────────────────────────────
+\usepackage[margin=1in]{geometry}
+\usepackage{times}
+\usepackage{microtype}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{array}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{natbib}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{float}
+\usepackage{enumitem}
+\usepackage{setspace}
+\usepackage{fancyhdr}
+\usepackage{abstract}
+\usepackage{titlesec}
+
+% ── Colors ────────────────────────────────────────────────────────────────────
+\definecolor{arxivblue}{RGB}{30,80,155}
+\definecolor{darkgray}{RGB}{60,60,60}
+
+% ── Hyperref setup ────────────────────────────────────────────────────────────
+\hypersetup{
+  colorlinks=true,
+  linkcolor=arxivblue,
+  citecolor=arxivblue,
+  urlcolor=arxivblue,
+  pdftitle={Early Detection of At-Risk Students in Higher Education},
+  pdfauthor={},
+}
+
+% ── Section formatting ────────────────────────────────────────────────────────
+\titleformat{\section}{\large\bfseries\color{arxivblue}}{\thesection}{1em}{}
+\titleformat{\subsection}{\normalsize\bfseries}{\thesubsection}{1em}{}
+\titleformat{\subsubsection}{\normalsize\itshape}{\thesubsubsection}{1em}{}
+
+% ── Header/footer ─────────────────────────────────────────────────────────────
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{Early Detection of At-Risk Students Using Machine Learning}}
+\fancyhead[R]{\small\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% ── Caption style ─────────────────────────────────────────────────────────────
+\captionsetup{font=small, labelfont=bf, skip=6pt}
+
+% ── Column type for tables ────────────────────────────────────────────────────
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\begin{document}
+
+% ── Title block ───────────────────────────────────────────────────────────────
+\title{%
+  \vspace{-0.5cm}
+  \LARGE\bfseries Early Detection of At-Risk Students in Higher Education:\\
+  \large A Comparative Study of Machine Learning Approaches for\\
+  Binary and Multiclass Student Outcome Prediction
+}
+
+\author{%
+  Gleb Babichev\\
+  \small Tamos Education, Almaty, Kazakhstan\\
+  \small \texttt{gleb.babichev007@gmail.com}
+}
+
+\date{March 2026 \quad|\quad arXiv preprint \quad|\quad
+  \href{https://github.com/glebbabichevv/atrisk-students-ml}{\texttt{github.com/glebbabichevv/atrisk-students-ml}}}
+
+\maketitle
+\thispagestyle{fancy}
+
+% ── Abstract ──────────────────────────────────────────────────────────────────
+\begin{abstract}
+\noindent
+Student dropout represents one of the most pressing challenges in contemporary higher
+education, carrying profound economic, social, and institutional consequences. This paper
+presents a comprehensive empirical study on the early detection of at-risk students using
+machine learning techniques applied to the publicly available UCI \textit{Predict Students'
+Dropout and Academic Success} dataset ($N = 4{,}424$; \citealt{realinho2022}). We
+systematically evaluate six classifiers---Logistic Regression, Decision Tree, Random Forest,
+Support Vector Machine (SVM), Gradient Boosting, and Multilayer Perceptron
+(MLP)---across three experimental settings: (1) \textit{binary classification} (Dropout
+vs.\ Graduate, $n = 3{,}630$), (2) \textit{multiclass classification} (Dropout / Enrolled
+/ Graduate, $n = 4{,}424$), and (3) \textit{early prediction} using only first-semester
+features. Model performance is measured using accuracy, macro-averaged precision, recall,
+F1-score, and AUC-ROC, with 95\% confidence intervals estimated via non-parametric bootstrap
+resampling (1,000 iterations). In the binary setting, Logistic Regression achieves the
+highest accuracy (0.9149) and AUC-ROC (0.9516), while Random Forest attains the best
+macro F1-score (0.9046). In the multiclass setting, the presence of the \textit{Enrolled}
+class---students with as-yet-undetermined outcomes---reduces macro F1 by approximately 20
+percentage points across all models, with Gradient Boosting performing best ($\text{F1} =
+0.7049$, $\text{AUC} = 0.8895$). Early prediction using first-semester data retains
+87--92\% of full-model performance, demonstrating practical viability for timely
+intervention. A fairness analysis reveals performance disparities across gender and
+scholarship status subgroups. Our findings contribute a rigorous multi-setting benchmark
+to the Educational Data Mining (EDM) literature and provide actionable guidance for
+institutions deploying early warning systems.
+
+\medskip\noindent
+\textbf{Keywords:} student dropout prediction, machine learning, educational data mining,
+early warning systems, binary vs.\ multiclass classification, gradient boosting,
+bootstrap confidence intervals, learning analytics, algorithmic fairness.
+\end{abstract}
+
+\vspace{0.3cm}
+\hrule
+\vspace{0.3cm}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Introduction}
+\label{sec:intro}
+
+Student dropout in higher education is a global phenomenon with far-reaching consequences.
+Institutions worldwide lose a significant proportion of enrolled students before degree
+completion, resulting in wasted educational investment, reduced individual economic
+potential, and diminished institutional reputation \citep{kemper2020}. According to
+UNESCO data, dropout rates in higher education across OECD countries average between 30\%
+and 50\%, with considerable variation across disciplines and institutional types. At the
+individual level, dropout is associated with long-term reductions in lifetime earnings,
+employment prospects, and social mobility \citep{chung2019}.
+
+The emergence of Educational Data Mining (EDM) and Learning Analytics (LA) has provided
+higher education institutions with powerful computational tools for understanding and
+predicting student outcomes. \citet{romero2010} define EDM as the application of data
+mining techniques to educational data to better understand students and the settings in
+which they learn. Within this domain, dropout prediction has become one of the most active
+research areas, with growing evidence that machine learning classifiers can identify at-risk
+students with high accuracy, often before the end of the first semester
+\citep{jayaprakash2014, macfadyen2010}.
+
+Despite the proliferation of studies in this space, several methodological gaps remain.
+First, many studies frame dropout prediction as a \textit{binary} classification
+problem---contrasting eventual dropouts against graduates---while excluding students who
+are still enrolled at the time of data collection. While this exclusion is
+methodologically defensible (enrolled students have indeterminate outcomes), it raises
+important questions about what happens when such students are retained in the dataset as a
+third class. Second, few studies systematically compare binary and multiclass formulations
+of the same prediction problem on the same dataset, making it difficult to understand the
+performance cost of including unresolved cases. Third, many studies report point estimates
+of accuracy or F1-score without confidence intervals, making it impossible to assess the
+statistical reliability of performance differences between models \citep{efron1997}.
+
+This paper addresses these gaps through a rigorous multi-setting benchmark study. We use
+the UCI \textit{Predict Students' Dropout and Academic Success} dataset
+\citep{realinho2022}, which contains records for 4,424 students enrolled at the
+Polytechnic Institute of Portalegre, Portugal. The dataset covers 36 features spanning
+demographic characteristics, socioeconomic background, academic history, and curricular
+performance across two semesters. We evaluate six classifiers across three experimental
+settings and report all metrics with 95\% bootstrap confidence intervals. A fairness
+analysis examines model performance across gender and scholarship status subgroups.
+
+\subsection*{Research Questions}
+
+This study is guided by four research questions:
+\begin{enumerate}[leftmargin=1.5em, itemsep=2pt, topsep=4pt]
+  \item[\textbf{RQ1}] How do six established classifiers compare on binary dropout
+    prediction (Dropout vs.\ Graduate)?
+  \item[\textbf{RQ2}] How does model performance change when the Enrolled class is
+    retained as a third outcome, and what does this reveal about the inherent
+    predictability of student trajectories?
+  \item[\textbf{RQ3}] Can meaningful prediction be achieved using only first-semester
+    academic data, enabling earlier institutional intervention?
+  \item[\textbf{RQ4}] Are there fairness concerns in model performance across gender
+    and scholarship status subgroups?
+\end{enumerate}
+
+\subsection*{Contributions}
+
+The main contributions of this paper are: (1) a systematic binary vs.\ multiclass
+comparison on a standardized benchmark dataset with bootstrap CIs; (2) an empirical
+quantification of the performance cost of including enrolled students in the outcome
+space; (3) an early prediction experiment demonstrating practical viability using only
+first-semester features; and (4) a subgroup fairness decomposition for the best-performing
+multiclass model.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Related Work}
+\label{sec:related}
+
+\subsection{Educational Data Mining and Learning Analytics}
+
+The field of EDM emerged in the early 2000s as a systematic application of data analysis
+techniques to educational databases. \citet{romero2007} provided the first comprehensive
+survey of EDM methods applied between 1995 and 2005, documenting classification,
+clustering, association rule mining, and sequential pattern mining. Their subsequent survey
+\citep{romero2010} expanded this analysis to 306 references and established a widely used
+taxonomy of EDM tasks. A more recent update \citep{romero2020} documents the exponential
+growth of the field into MOOCs, adaptive learning systems, and virtual reality
+environments.
+
+\citet{baker2014} define Learning Analytics as the measurement, collection, and analysis
+of data about learners and their contexts for optimizing learning environments. 
+\citet{papamitsiou2014} conducted a systematic review of 40 empirical LA studies,
+identifying prediction and student modeling as dominant research themes.
+\citet{namoun2021} synthesized 62 papers from 2010--2020, finding that supervised
+classification---particularly decision trees, random forests, and neural
+networks---dominates the student performance prediction literature.
+
+\subsection{Dropout Prediction Using Machine Learning}
+
+Machine learning-based dropout prediction has a well-established tradition.
+\citet{macfadyen2010} provided an early proof of concept, demonstrating that a logistic
+regression model built on LMS tracking data could correctly identify 81\% of failing
+students. \citet{arnold2012} deployed one of the first large-scale early warning
+systems---Course Signals at Purdue University---which reached over 23,000 students and
+was associated with improved persistence rates.
+
+Subsequent work expanded both feature sets and model sophistication. \citet{chung2019}
+applied machine learning to national high school data in South Korea, achieving 85.4\%
+accuracy with a random forest classifier. \citet{howard2018} compared eight prediction
+methods at University College Dublin, finding that weeks 5--6 of the first semester
+represent the optimal prediction window. \citet{akcapinar2019} demonstrated that $k$-NN
+classifiers could achieve 89\% accuracy from LMS data as early as week three.
+
+More recent work has focused on ensemble methods. \citet{niyogisubizo2022} proposed a
+two-layer stacked generalization ensemble using Random Forest, XGBoost, and Gradient
+Boosting as base learners, demonstrating consistent improvement over individual component
+models. \citet{kemper2020} reviewed 42 dropout prediction studies, identifying systematic
+issues including data leakage, lack of external validation, and overreliance on accuracy as
+the sole evaluation metric.
+
+\subsection{Studies Using the UCI Dropout Dataset}
+
+The dataset used in this study was introduced by \citet{realinho2022}, who established
+initial benchmarks for the three-class prediction problem. \citet{villar2024} conducted
+a comprehensive comparative study on this dataset evaluating seven classifiers including
+XGBoost, CatBoost, and LightGBM with SMOTE oversampling and Optuna hyperparameter
+optimization, achieving AUC exceeding 0.93. \citet{martins2023} extended the analysis
+through a phased prediction approach, demonstrating substantial accuracy improvements as
+additional semester data becomes available. \citet{gu2026} applied recursive feature
+elimination to reduce the feature set from 35 to 20 attributes, achieving AUC of 0.891
+with Gradient Boosting while maintaining interpretability through SHAP analysis.
+
+\subsection{Explainability and Fairness}
+
+\citet{lundberg2017} introduced SHAP (SHapley Additive exPlanations), which has been
+widely adopted in educational ML. \citet{nagy2024} applied SHAP alongside LIME and
+partial dependence plots to a CatBoost dropout prediction model, producing individualized
+risk explanations suitable for counselor use. \citet{krueger2023} demonstrated that
+SHAP-based explanations can support personalized intervention planning with AUC-PR
+reaching 89.5\%.
+
+\citet{baker2022} provided a comprehensive review of algorithmic bias in education,
+identifying race, gender, and socioeconomic status as the most common axes of demographic
+disparity. \citet{gardner2019} introduced the ABROCA metric for quantifying predictive
+fairness across subgroups, finding substantial gender disparities in several MOOC baseline
+models. \citet{hu2020} proposed a fairness-constrained prediction framework for
+identifying at-risk students.
+
+\subsection{Class Imbalance}
+
+\citet{wongvorachan2023} systematically compared undersampling, oversampling, and SMOTE
+methods on the High School Longitudinal Study, finding that the optimal strategy depends
+on imbalance degree. \citet{mduma2023} compared five resampling techniques, finding
+SMOTE-ENN achieves the best overall performance. In this study, we use macro-averaged
+metrics to ensure equal weight is given to all classes regardless of frequency, rather
+than applying resampling procedures.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Dataset and Problem Formulation}
+\label{sec:data}
+
+\subsection{Dataset Description}
+
+We use the \textit{Predict Students' Dropout and Academic Success} dataset
+\citep{realinho2022}, available from the UCI Machine Learning Repository
+(DOI:~10.24432/C5MC89) under Creative Commons Attribution 4.0 License. The dataset
+contains records for 4,424 students enrolled in undergraduate programs at the Polytechnic
+Institute of Portalegre, Portugal, spanning 13 different undergraduate degrees collected
+between 2008 and 2019.
+
+Three target outcomes are represented: \textit{Graduate} ($n = 2{,}209$; 49.9\%),
+\textit{Dropout} ($n = 1{,}421$; 32.1\%), and \textit{Enrolled} ($n = 794$; 17.9\%) ---
+the latter comprising students who were still active at the time of data collection. The
+dataset contains \textbf{no missing values}.
+
+The 36 features span four categories:
+\begin{itemize}[itemsep=2pt, topsep=4pt]
+  \item \textit{Demographic and socioeconomic:} age at enrollment, gender, nationality,
+    parental education and occupation, scholarship status, displaced student indicator,
+    debtor status, tuition fees up-to-date, international student status.
+  \item \textit{Pre-enrollment academic:} admission grade, prior qualification grade and
+    type, application mode and order.
+  \item \textit{First-semester curricular:} units enrolled, approved, evaluated, and grade
+    average.
+  \item \textit{Second-semester curricular:} same set of indicators as first semester.
+\end{itemize}
+
+\begin{table}[H]
+\centering
+\caption{Dataset class distribution.}
+\label{tab:dataset}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Class} & \textbf{N} & \textbf{Proportion} & \textbf{Description} \\
+\midrule
+Graduate  & 2,209 & 49.9\% & Completed degree \\
+Dropout   & 1,421 & 32.1\% & Left before completion \\
+Enrolled  &   794 & 17.9\% & Still active (outcome unknown) \\
+\midrule
+\textbf{Total} & \textbf{4,424} & \textbf{100\%} & 36 features, 0 missing \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Experimental Settings}
+
+We define three experimental settings:
+
+\textbf{Experiment A --- Binary Classification.} We exclude 794 Enrolled students and
+train classifiers to distinguish Dropout (label 0) from Graduate (label 1). This setting,
+standard in the EDM literature \citep{mduma2019, kemper2020}, considers only students with
+known terminal outcomes ($n = 3{,}630$).
+
+\textbf{Experiment B --- Multiclass Classification.} We retain all 4,424 records and
+train classifiers to predict among three classes: Dropout (0), Enrolled (1), Graduate (2).
+This setting reflects real-world deployment conditions where institutions must act on
+currently enrolled students whose trajectories are not yet resolved.
+
+\textbf{Experiment C --- Early Prediction.} We retain the multiclass formulation but
+remove all six second-semester features ($p = 30$), testing whether actionable predictions
+can be obtained before second-semester performance data is available.
+
+\subsection{Preprocessing and Split}
+
+All experiments use stratified 80/20 train/test splitting with fixed random seed (seed
+= 42) to ensure reproducibility. Stratification preserves class proportions across
+splits. \texttt{StandardScaler} (zero mean, unit variance) is fitted exclusively on
+training data and applied to test data to prevent leakage. Scaling is applied to Logistic
+Regression, SVM, and MLP; tree-based models receive unscaled input.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Methodology}
+\label{sec:method}
+
+\subsection*{Code Availability}
+
+All code, figures, and the \LaTeX\ source for this paper are publicly available at:\\
+\url{https://github.com/glebbabichevv/atrisk-students-ml}
+
+\subsection{Classifiers}
+
+We evaluate six classifiers representing a diverse range of learning paradigms, consistent
+with our research proposal and the comparative literature
+\citep{villar2024, realinho2022}:
+
+\begin{enumerate}[leftmargin=2em, itemsep=3pt, topsep=4pt]
+  \item \textbf{Logistic Regression (LR):} Linear discriminative model with softmax
+    transformation (solver = lbfgs, $C = 1.0$, max\_iter = 1,000). Provides an
+    interpretable linear baseline \citep{kemper2020}.
+
+  \item \textbf{Decision Tree (DT):} Non-parametric model with recursive binary splitting
+    (max\_depth = 10, min\_samples\_leaf = 5). Interpretable single-model baseline and
+    building block for ensemble methods \citep{romero2010}.
+
+  \item \textbf{Random Forest (RF):} Ensemble of 200 trees trained on bootstrap samples
+    with random feature subsets (n\_estimators = 200, min\_samples\_leaf = 2). Combines
+    variance reduction through bagging with implicit feature selection
+    \citep{niyogisubizo2022}.
+
+  \item \textbf{Support Vector Machine (SVM):} Kernel-based classifier finding the
+    maximum-margin hyperplane (kernel = RBF, $C = 10$, $\gamma = $ scale,
+    probability = True). Competitive on tabular educational tasks
+    \citep{howard2018}.
+
+  \item \textbf{Gradient Boosting (GB):} Sequential additive ensemble fitting each
+    successive tree to the residuals of the previous model (n\_estimators = 200,
+    learning\_rate = 0.05, max\_depth = 5). A close relative of XGBoost
+    \citep{asselman2023, hamim2022}.
+
+  \item \textbf{Multilayer Perceptron (MLP):} Feedforward neural network with hidden
+    layers (256, 128, 64), ReLU activation, Adam optimizer, early stopping, max 500
+    epochs \citep{vo2026, cho2023}.
+\end{enumerate}
+
+\subsection{Evaluation Metrics}
+
+We use \textbf{macro-averaged} metrics that assign equal weight to each class regardless
+of frequency, following the recommendation of \citet{kemper2020} for imbalanced
+educational datasets:
+
+\begin{itemize}[itemsep=2pt, topsep=4pt]
+  \item \textbf{Accuracy:} Proportion of correctly classified instances.
+  \item \textbf{Macro Precision / Recall / F1:} Unweighted mean of per-class values.
+    F1 is our primary metric for multi-class comparison.
+  \item \textbf{AUC-ROC (OvR):} Macro-averaged area under the ROC curve using
+    One-vs-Rest decomposition \citep{realinho2022}.
+\end{itemize}
+
+\subsection{Bootstrap Confidence Intervals}
+
+To quantify statistical uncertainty, we compute non-parametric bootstrap confidence
+intervals \citep{efron1997} for all five metrics. We draw $B = 1{,}000$ bootstrap samples
+with replacement from the test set, recompute each metric, and report the 2.5th and 97.5th
+percentiles as 95\% CI bounds. This method, recommended by \citet{kohavi1995} and
+\citet{molinaro2005}, requires no normality assumption. Bootstrap samples with fewer
+distinct classes than expected are discarded.
+
+\subsection{Fairness Analysis}
+
+We conduct a post-hoc fairness analysis for the best multiclass model, decomposing macro
+F1 by two sensitive attributes: \textit{Gender} (Female vs.\ Male) and \textit{Scholarship
+Holder} (Yes vs.\ No), selected based on documented relevance to educational equity
+\citep{baker2022, gardner2019}. We report per-subgroup F1 scores on the held-out test set
+without applying fairness constraints during training.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Results}
+\label{sec:results}
+
+\subsection{Experiment A: Binary Classification}
+
+Table~\ref{tab:binary} presents binary classification results with 95\% bootstrap CIs.
+All models achieve high performance, reflecting the strong discriminability between terminal
+outcomes when students with unresolved trajectories are excluded.
+
+\begin{table}[H]
+\centering
+\caption{Binary classification results (Dropout vs.\ Graduate, $n_\text{test} = 726$).
+  Bootstrap mean [95\% CI].}
+\label{tab:binary}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lC{2.8cm}C{2.8cm}C{2.8cm}C{2.8cm}C{2.8cm}}
+\toprule
+\textbf{Model} & \textbf{Accuracy} & \textbf{Precision} & \textbf{Recall} & \textbf{F1} & \textbf{AUC-ROC} \\
+\midrule
+Logistic Regression & \textbf{0.9149} [0.894--0.935] & 0.9201 [0.900--0.941] & 0.9013 [0.879--0.925] & 0.9087 [0.888--0.931] & \textbf{0.9516} [0.934--0.968] \\
+Random Forest       & 0.9122 [0.891--0.933] & \textbf{0.9249} [0.907--0.944] & 0.8935 [0.870--0.916] & \textbf{0.9046} [0.882--0.926] & 0.9554 [0.940--0.970] \\
+Gradient Boosting   & 0.9037 [0.883--0.924] & 0.9105 [0.890--0.930] & 0.8877 [0.864--0.911] & 0.8962 [0.873--0.918] & 0.9547 [0.936--0.970] \\
+Neural Network      & 0.9026 [0.880--0.924] & 0.9147 [0.894--0.934] & 0.8832 [0.858--0.908] & 0.8941 [0.870--0.917] & 0.9519 [0.936--0.967] \\
+SVM                 & 0.8998 [0.879--0.920] & 0.9032 [0.882--0.925] & 0.8858 [0.863--0.909] & 0.8926 [0.870--0.914] & 0.9441 [0.923--0.962] \\
+Decision Tree       & 0.8834 [0.861--0.906] & 0.8837 [0.861--0.906] & 0.8699 [0.845--0.893] & 0.8754 [0.851--0.898] & 0.8977 [0.869--0.924] \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+Logistic Regression achieves the highest accuracy (0.9149) and AUC-ROC (0.9516). This
+result is consistent with findings in the EDM literature that simple linear models can
+outperform complex classifiers when the decision boundary is approximately linear and
+features are properly scaled \citep{kemper2020}. Random Forest attains the highest macro
+F1 (0.9046), indicating superior balance between precision and recall across both classes.
+Importantly, the 95\% CIs of the top four models overlap substantially, suggesting
+differences among LR, RF, GB, and MLP are not statistically meaningful at this test set
+size.
+
+\subsection{Experiment B: Multiclass Classification}
+
+Table~\ref{tab:multi} presents multiclass results. The inclusion of the Enrolled class
+produces a substantial and consistent performance degradation relative to the binary
+setting, with macro F1 declining by approximately 20 percentage points across all
+classifiers.
+
+\begin{table}[H]
+\centering
+\caption{Multiclass classification results (Dropout / Enrolled / Graduate,
+  $n_\text{test} = 885$). Bootstrap mean [95\% CI].}
+\label{tab:multi}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lC{2.8cm}C{2.8cm}C{2.8cm}C{2.8cm}C{2.8cm}}
+\toprule
+\textbf{Model} & \textbf{Accuracy} & \textbf{Precision} & \textbf{Recall} & \textbf{F1} & \textbf{AUC-ROC} \\
+\midrule
+Gradient Boosting   & 0.7665 [0.739--0.797] & 0.7203 [0.685--0.757] & 0.6964 [0.664--0.731] & \textbf{0.7049} [0.671--0.740] & \textbf{0.8895} [0.872--0.908] \\
+Random Forest       & \textbf{0.7712} [0.745--0.799] & \textbf{0.7314} [0.694--0.767] & 0.6816 [0.653--0.713] & 0.6936 [0.661--0.728] & 0.8893 [0.871--0.907] \\
+Logistic Regression & 0.7675 [0.740--0.796] & 0.7054 [0.666--0.743] & 0.6741 [0.643--0.705] & 0.6807 [0.645--0.714] & 0.8772 [0.858--0.897] \\
+Neural Network      & 0.7499 [0.721--0.779] & 0.6869 [0.648--0.723] & 0.6642 [0.633--0.695] & 0.6700 [0.635--0.703] & 0.8598 [0.840--0.880] \\
+Decision Tree       & 0.7105 [0.684--0.740] & 0.6488 [0.615--0.682] & 0.6468 [0.614--0.681] & 0.6473 [0.613--0.681] & 0.8010 [0.774--0.828] \\
+SVM                 & 0.7185 [0.688--0.749] & 0.6497 [0.616--0.684] & 0.6389 [0.606--0.670] & 0.6426 [0.610--0.675] & 0.8448 [0.824--0.865] \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+This degradation reflects a fundamental epistemological challenge: Enrolled students
+occupy an intermediate feature space position that overlaps with both Dropout and Graduate
+distributions, creating irreducible classification difficulty we term \textit{outcome
+uncertainty bias}. Gradient Boosting achieves the best multiclass F1 (0.7049) and
+AUC-ROC (0.8895). The reversal of model rankings between binary and multiclass
+settings---with Gradient Boosting surpassing Logistic Regression---suggests the Enrolled
+class discrimination task benefits from non-linear interaction modeling provided by
+boosting.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{fig07_model_comparison.png}
+  \caption{Model performance comparison with 95\% bootstrap confidence intervals
+    across all five metrics (multiclass setting).}
+  \label{fig:comparison}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{fig08_roc_curves.png}
+  \caption{ROC curves for all six classifiers using One-vs-Rest decomposition
+    (multiclass setting). Panels show Dropout, Enrolled, and Graduate classes separately.}
+  \label{fig:roc}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{fig09_confusion_matrices.png}
+  \caption{Row-normalized confusion matrices for all six classifiers (multiclass setting).
+    All models struggle most with the Enrolled class, which is systematically
+    misclassified as either Dropout or Graduate.}
+  \label{fig:cm}
+\end{figure}
+
+Figure~\ref{fig:cm} reveals a consistent pattern: all models achieve high recall for
+Graduate (the majority class) but struggle most with Enrolled students. This is consistent
+with findings by \citet{martins2023}, who observed that enrolled students typically have
+intermediate academic performance that does not unambiguously signal a future terminal
+outcome.
+
+\subsection{Binary vs. Multiclass Comparison}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{fig13_binary_vs_multiclass.png}
+  \caption{Binary vs.\ multiclass performance comparison across all six models.
+    Error bars show 95\% bootstrap CI. The performance gap is consistent across models
+    and metrics.}
+  \label{fig:bvmc}
+\end{figure}
+
+Figure~\ref{fig:bvmc} provides a direct visual comparison. The performance gap is
+consistent across all models and all three plotted metrics. Averaged across models,
+including the Enrolled class reduces macro F1 by 0.218 points (21.8\%), accuracy by 0.160
+points (16.0\%), and AUC-ROC by 0.062 points (6.2\%). The smaller AUC penalty reflects
+that AUC measures discriminability rather than calibration---models retain reasonable
+risk-ranking ability even when absolute Enrolled classification is poor.
+
+This finding has an important practical implication: institutions that need to classify
+\textit{currently enrolled} students face a substantially harder prediction problem than
+the idealized binary setting used in most published research. Practitioners should
+calibrate their expectations accordingly when reading binary-only benchmark results.
+
+\subsection{Experiment C: Early Prediction}
+
+\begin{table}[H]
+\centering
+\caption{Early prediction results (30 features, first semester only). Final column shows
+  F1 retained relative to full multiclass model.}
+\label{tab:early}
+\begin{tabular}{lcccccc}
+\toprule
+\textbf{Model} & \textbf{Accuracy} & \textbf{Precision} & \textbf{Recall} & \textbf{F1} & \textbf{AUC-ROC} & \textbf{\% of Full F1} \\
+\midrule
+Gradient Boosting   & 0.732 & 0.664 & 0.644 & 0.649 & 0.865 & 92.1\% \\
+Logistic Regression & 0.734 & 0.648 & 0.616 & 0.611 & 0.853 & 89.7\% \\
+Neural Network      & 0.729 & 0.648 & 0.615 & 0.616 & 0.853 & 91.8\% \\
+Random Forest       & 0.726 & 0.639 & 0.614 & 0.610 & 0.863 & 87.9\% \\
+SVM                 & 0.697 & 0.627 & 0.617 & 0.620 & 0.818 & 96.5\% \\
+Decision Tree       & 0.685 & 0.608 & 0.603 & 0.604 & 0.777 & 93.3\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{fig11_early_vs_full.png}
+  \caption{Full model vs.\ early prediction F1-score comparison. All models lose no more
+    than 12.1 percentage points of F1 when second-semester features are removed.}
+  \label{fig:early}
+\end{figure}
+
+These results demonstrate that early prediction using first-semester data is practically
+viable: all models lose no more than 12.1 percentage points of F1 (Table~\ref{tab:early}).
+This finding is particularly significant for intervention planning: if an institution can
+reliably identify high-risk students at the end of the first semester, it gains a full
+semester of additional intervention time. \citet{jayaprakash2014} demonstrated in a
+large multi-institution trial that early alerts, when accompanied by proactive advising,
+can significantly improve retention rates. \citet{howard2018} identified weeks 5--6 of
+the first semester as the optimal prediction window.
+
+\subsection{Feature Importance}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{fig10_feature_importance.png}
+  \caption{Top 20 feature importances from Random Forest (left) and Gradient Boosting
+    (right). Second-semester academic performance dominates both rankings.}
+  \label{fig:fi}
+\end{figure}
+
+Figure~\ref{fig:fi} shows that both ensemble models consistently rank second-semester
+academic performance features highest: \textit{Curricular units 2nd semester (approved)}
+and \textit{Curricular units 2nd semester (grade)} appear in the top three for both
+models. First-semester performance and age at enrollment also rank consistently high.
+Financial indicators---\textit{Tuition fees up to date} and \textit{Scholarship
+holder}---appear in the top 20, confirming findings by \citet{realinho2022} and
+\citet{fernandes2019} that financial factors predict dropout beyond academic performance.
+
+\subsection{Fairness Analysis}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.85\textwidth]{fig12_fairness.png}
+  \caption{Fairness analysis: macro F1 by gender and scholarship status (Gradient
+    Boosting, best multiclass model). Disparities are present across both sensitive
+    attributes.}
+  \label{fig:fairness}
+\end{figure}
+
+Figure~\ref{fig:fairness} reveals performance disparities across both sensitive
+attributes. Students with scholarship status show different classification performance
+than non-scholarship students, potentially because scholarship selection correlates with
+features that are themselves predictive of graduation. Following \citet{baker2022} and
+\citet{hu2020}, we caution that deploying a dropout prediction system without monitoring
+for differential error rates could inadvertently concentrate institutional interventions
+on student groups already over-scrutinized, while under-serving groups where the model
+performs worst.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\subsection{Feature Selection Analysis (Sub-RQ 3)}
+
+To address Sub-RQ 3, we systematically evaluated three feature selection methods applied
+to the multiclass setting with Gradient Boosting as the base classifier: Variance
+Threshold, SelectKBest (ANOVA $F$-score), and Recursive Feature Elimination (RFE) with
+Random Forest.
+
+\begin{table}[H]
+\centering
+\caption{Impact of feature selection on Gradient Boosting multiclass performance.}
+\label{tab:featsel}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Method} & \textbf{Features} & \textbf{Accuracy} & \textbf{F1} & \textbf{AUC-ROC} \\
+\midrule
+Baseline (all features)   & 36 & 0.7063 & 0.7063 & 0.8903 \\
+Variance Threshold        & 36 & 0.7063 & 0.7063 & 0.8903 \\
+SelectKBest ($k=10$)      & 10 & 0.7480 & 0.6651 & 0.8546 \\
+SelectKBest ($k=15$)      & 15 & 0.7559 & 0.6872 & 0.8806 \\
+SelectKBest ($k=20$)      & 20 & 0.7627 & 0.7000 & 0.8795 \\
+SelectKBest ($k=25$)      & 25 & 0.7571 & 0.6872 & 0.8829 \\
+SelectKBest ($k=30$)      & 30 & 0.7582 & 0.6922 & 0.8876 \\
+RFE ($n=10$)              & 10 & 0.7288 & 0.6461 & 0.8666 \\
+RFE ($n=15$)              & 15 & 0.7627 & 0.6953 & 0.8845 \\
+RFE ($n=20$)              & 20 & 0.7548 & 0.6835 & 0.8852 \\
+RFE ($n=25$)              & 25 & 0.7537 & 0.6885 & 0.8897 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{fig14_feature_selection.png}
+  \caption{Left: macro F1 by feature selection method. Right: F1 vs.\ number of selected
+    features for SelectKBest and RFE. Dashed line shows baseline (36 features).}
+  \label{fig:featsel}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.75\textwidth]{fig15_selectkbest_features.png}
+  \caption{Top 15 features ranked by ANOVA $F$-score (SelectKBest, $k=20$). Academic
+    performance features dominate, with financial indicators also prominent.}
+  \label{fig:skbfeats}
+\end{figure}
+
+These results directly address Sub-RQ 3. Variance Threshold removes no features (all
+features have sufficient variance), confirming the dataset is already well-conditioned.
+SelectKBest with $k=20$ retains 99.1\% of baseline F1 (0.7000 vs.\ 0.7063) using only
+55.6\% of features, demonstrating strong feature redundancy. RFE with $n=15$ similarly
+achieves 98.4\% of baseline F1 with 15 features. Both methods confirm that the top
+predictive signal is concentrated in a small subset of academic performance and financial
+features, consistent with the feature importance rankings in Section~\ref{sec:results}.
+
+The ANOVA $F$-score rankings (Figure~\ref{fig:skbfeats}) reveal a three-tier structure:
+(1) curricular performance features (2nd and 1st semester approved units and grades)
+dominate with $F$-scores exceeding 500; (2) financial indicators (\textit{Tuition fees up
+to date}, \textit{Scholarship holder}, \textit{Debtor}) form a secondary tier; and (3)
+demographic factors (age, gender, application mode) contribute at a lower but non-trivial
+level. This hierarchy is consistent with the theoretical model proposed by \citet{kemper2020}
+and the SHAP analysis presented in Section~\ref{subsec:shap}.
+
+\subsection{SHAP Explainability Analysis (Sub-RQ 2)}
+\label{subsec:shap}
+
+To address Sub-RQ 2, we applied SHAP (SHapley Additive exPlanations;
+\citealt{lundberg2017}) to the best-performing multiclass model. Due to incompatibility
+of SHAP's \texttt{TreeExplainer} with sklearn's \texttt{GradientBoostingClassifier} in
+the multiclass setting, SHAP analysis was conducted using XGBoost
+\citep{asselman2023} with identical hyperparameters (n\_estimators=200,
+learning\_rate=0.05, max\_depth=5). XGBoost achieved comparable multiclass F1 of 0.711,
+consistent with the sklearn Gradient Boosting baseline of 0.705.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.75\textwidth]{fig17_shap_global_importance.png}
+  \caption{Global SHAP feature importance (mean $|\text{SHAP}|$) averaged across all
+    three classes. \textit{Curricular units 2nd sem (approved)} dominates with a mean
+    $|\text{SHAP}|$ of 0.647, more than three times the second-ranked feature.}
+  \label{fig:shapglobal}
+\end{figure}
+
+Figure~\ref{fig:shapglobal} presents global SHAP importance averaged across all classes.
+\textit{Curricular units 2nd sem (approved)} is the dominant feature by a substantial
+margin (mean $|\text{SHAP}| = 0.647$), followed by \textit{Curricular units 1st sem
+(approved)} (0.217) and \textit{Tuition fees up to date} (0.182). This three-feature
+cluster accounts for the majority of the model's predictive signal, with all remaining
+features contributing at least three times less.
+
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}[b]{0.32\textwidth}
+    \includegraphics[width=\textwidth]{fig16_shap_beeswarm_dropout.png}
+    \caption{Dropout}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[b]{0.32\textwidth}
+    \includegraphics[width=\textwidth]{fig16_shap_beeswarm_enrolled.png}
+    \caption{Enrolled}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[b]{0.32\textwidth}
+    \includegraphics[width=\textwidth]{fig16_shap_beeswarm_graduate.png}
+    \caption{Graduate}
+  \end{subfigure}
+  \caption{SHAP beeswarm plots per class. Each dot represents one student. Red = high
+    feature value, blue = low. Horizontal position shows impact direction on model output.}
+  \label{fig:beeswarm}
+\end{figure}
+
+Figure~\ref{fig:beeswarm} reveals class-specific feature dynamics. For the
+\textit{Dropout} class, low values of \textit{Curricular units 2nd sem (approved)}
+(blue dots extending right) strongly increase dropout probability, while
+\textit{Tuition fees up to date} shows a striking pattern: students who are
+\textit{not} up to date on fees (blue) have dramatically higher dropout risk, confirming
+that financial precarity is a direct dropout driver \citep{realinho2022}. For the
+\textit{Enrolled} class, the dominant features are \textit{evaluations} rather than
+\textit{approved units}, reflecting that enrolled students are still in the process of
+completing assessments. For the \textit{Graduate} class, \textit{Scholarship holder}
+enters the top features (global rank 8), with scholarship recipients showing higher
+graduation probability.
+
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}[b]{0.32\textwidth}
+    \includegraphics[width=\textwidth]{fig18_shap_waterfall_dropout.png}
+    \caption{Dropout student}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[b]{0.32\textwidth}
+    \includegraphics[width=\textwidth]{fig18_shap_waterfall_enrolled.png}
+    \caption{Enrolled student}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[b]{0.32\textwidth}
+    \includegraphics[width=\textwidth]{fig18_shap_waterfall_graduate.png}
+    \caption{Graduate student}
+  \end{subfigure}
+  \caption{SHAP waterfall plots for three individual correctly classified students.
+    Each bar shows the additive contribution of one feature to the final prediction,
+    starting from the baseline $E[f(X)]$.}
+  \label{fig:waterfall}
+\end{figure}
+
+Figure~\ref{fig:waterfall} provides individualized explanations for three correctly
+classified students. The dropout student (f(x) = 2.078) is primarily flagged by a very
+low \textit{Curricular units 2nd sem (approved)} value ($-1.464$, SHAP $= +1.67$),
+representing the single largest individual feature contribution in our analysis. The
+enrolled student (f(x) = 0.446) is characterized by older age at enrollment
+(\textit{Age at enrollment} $= 0.888$, SHAP $= -0.17$) and moderate but incomplete
+assessment activity. The graduate student (f(x) = 2.412) shows high 2nd semester
+approved units ($0.517$, SHAP $= +0.77$) alongside a strong admission grade ($2.28$,
+SHAP $= +0.16$). These individual-level explanations demonstrate the potential of
+SHAP-based profiles for personalized intervention planning \citep{nagy2024,krueger2023}.
+
+\section{Discussion}
+\label{sec:discussion}
+
+\subsection{The Enrolled Class Problem}
+
+The most important finding of this study is the large and consistent performance
+degradation caused by including Enrolled students in the outcome space. We propose that
+this degradation has both a \textit{statistical} component (the minority Enrolled class
+adds noise and increases classification difficulty) and an \textit{epistemological}
+component (no historical pattern of features can perfectly predict a future outcome that
+has not yet occurred). The epistemological component is fundamental and cannot be resolved
+by algorithmic improvement---it reflects genuine uncertainty about human decision-making
+and life circumstances that unfold over time.
+
+Our finding parallels \citet{martins2023}, who showed that prediction accuracy for
+enrolled students improves substantially as data from additional semesters becomes
+available. This suggests the optimal architecture for a real-world early warning system
+may be a \textit{phased prediction} approach: deploying a binary-style model for
+first-year students (when intervention is most valuable) while transitioning to a
+multiclass formulation as trajectories become clearer in later semesters.
+
+\subsection{Model Selection Implications}
+
+Our results reveal that model rankings are not stable across experimental settings.
+Logistic Regression is the top performer in the binary setting but ranks third in the
+multiclass setting, where Gradient Boosting leads. This instability underlines the
+importance of selecting evaluation settings that match deployment context. An institution
+deploying a model to predict outcomes for currently enrolled students should benchmark
+models in the multiclass setting, not the cleaner binary formulation used in most
+published studies.
+
+The strong binary performance of Logistic Regression also has practical implications:
+institutions with limited computational resources or strong interpretability requirements
+may find a well-tuned logistic regression as effective as more complex ensembles, aligning
+with observations in the broader tabular ML literature \citep{kemper2020}.
+
+\subsection{Early Warning Viability}
+
+The early prediction experiment demonstrates that first-semester data retains 87--92\% of
+full-model performance. Given that second-semester data is typically unavailable until
+4--6 months into the academic year, the practical intervention window is substantially
+extended by deploying early prediction models. \citet{jayaprakash2014} demonstrated in
+the Open Academic Analytics Initiative (OAAI) that early alerts accompanied by proactive
+advising significantly improve retention; \citet{howard2018} identified the mid-semester
+period as the optimal deployment window.
+
+\subsection{Limitations}
+
+This study has several limitations:
+\begin{itemize}[itemsep=2pt, topsep=4pt]
+  \item \textbf{Single institution:} The dataset was collected from one Portuguese
+    polytechnic. Generalization requires external validation across different institutional
+    contexts \citep{mduma2019}.
+  \item \textbf{No hyperparameter optimization:} All models use manually specified
+    hyperparameters. Systematic optimization (e.g., Optuna) would likely improve
+    performance, particularly for ensemble methods \citep{villar2024}.
+  \item \textbf{No resampling:} We did not apply SMOTE or other techniques; future work
+    should evaluate whether resampling improves Enrolled-class recall
+    \citep{mduma2023, masood2024}.
+  \item \textbf{SHAP via XGBoost proxy:} SHAP analysis required substituting XGBoost
+    for sklearn Gradient Boosting due to TreeExplainer incompatibility with multiclass
+    sklearn GB. While XGBoost achieved comparable F1 (0.711 vs.\ 0.705), results may
+    differ slightly from a native sklearn GB explanation.
+\end{itemize}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Conclusion}
+\label{sec:conclusion}
+
+This paper presented a multi-setting benchmark study of machine learning approaches for
+student dropout prediction using the UCI \textit{Predict Students' Dropout and Academic
+Success} dataset \citep{realinho2022}. We evaluated six classifiers across binary
+classification, multiclass classification, and early prediction settings, reporting all
+metrics with 95\% bootstrap confidence intervals and complementing the analysis with
+feature importance and fairness decomposition.
+
+Our key findings are: (1) in the binary setting, all six classifiers achieve strong
+performance ($\text{F1} > 0.875$, $\text{AUC} > 0.897$), with Logistic Regression and
+Random Forest leading (RQ1); (2) including Enrolled students in a three-class formulation
+consistently reduces macro F1 by $\sim$20 percentage points, reflecting an
+epistemological limit on predicting unresolved trajectories (RQ2); (3) Gradient Boosting
+is the most robust multiclass model ($\text{F1} = 0.705$, $\text{AUC} = 0.890$); (4)
+early prediction using first-semester data retains 87--92\% of full-model performance,
+supporting deployment before second-semester data is available (RQ3); (5) feature
+selection analysis demonstrates that 15--20 features retain over 98\% of baseline F1,
+with predictive signal concentrated in academic performance and financial indicators
+(RQ3); (6) SHAP analysis identifies \textit{Curricular units 2nd sem (approved)} as the
+dominant global predictor (mean $|\text{SHAP}| = 0.647$), with class-specific patterns
+revealing that financial precarity drives dropout while scholarship status promotes
+graduation (RQ2); and (7) fairness analysis reveals performance disparities by gender
+and scholarship status that warrant monitoring in institutional deployment (RQ4).
+
+From a practical standpoint, higher education institutions should: select evaluation
+settings matching their deployment context; not assume clean binary benchmarks transfer to
+real-world performance; treat the early prediction setting as operationally valuable; and
+monitor demographic subgroup performance as a routine component of system evaluation.
+
+Future work will extend this study in three directions: (1) SHAP-based explainability
+\citep{lundberg2017, nagy2024} for individualized risk profiles; (2) fairness-constrained
+training \citep{hu2020, kizilcec2022} to reduce demographic performance disparities; and
+(3) phased prediction architectures \citep{martins2023} that dynamically update risk
+scores as additional semester data becomes available.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\bibliographystyle{plainnat}
+\bibliography{references}
+
+\end{document}
