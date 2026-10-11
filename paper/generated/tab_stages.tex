@@ -1,0 +1,18 @@
+\begin{table}[t]
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\footnotesize
+\caption{Three-class prediction at three points in time. Each row reports the model with the highest macro F1 at that stage.}
+\label{tab:stages}
+\begin{tabular}{llccccc}
+\toprule
+Information used & Best model & Macro F1 & F1 Dropout & F1 Enrolled & F1 Graduate & AUC Dropout \\
+\midrule
+Enrolment only & Gradient Boosting & 0.551 $\pm$ 0.013 & 0.636 & 0.272 & 0.746 & 0.817 \\
++ 1st semester & Gradient Boosting & 0.673 $\pm$ 0.013 & 0.766 & 0.415 & 0.839 & 0.905 \\
++ 2nd semester & XGBoost & 0.712 $\pm$ 0.013 & 0.794 & 0.483 & 0.859 & 0.926 \\
+\bottomrule
+\end{tabular}
+\par\smallskip\footnotesize AUC Dropout: the predicted probability of the Dropout class scored against Dropout vs.\ all other students.
+\end{table}

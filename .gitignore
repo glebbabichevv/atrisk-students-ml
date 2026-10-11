@@ -25,3 +25,6 @@ paper/*.bbl
 paper/*.blg
 paper/*.out
 paper/*.pdf
+paper/*.fdb_latexmk
+paper/*.fls
+results/*.npz

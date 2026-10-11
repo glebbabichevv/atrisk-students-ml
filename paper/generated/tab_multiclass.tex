@@ -1,0 +1,22 @@
+\begin{table}[t]
+\centering
+\small
+\setlength{\tabcolsep}{3.5pt}
+\caption{Three-class setting with first- and second-semester records ($n=4{,}424$). AUC is the macro one-vs-rest average.}
+\label{tab:multi}
+\begin{tabular}{lcccccc}
+\toprule
+Model & Accuracy & Macro F1 & AUC & F1 Dropout & F1 Enrolled & F1 Graduate \\
+\midrule
+Logistic Regression & 0.779 $\pm$ 0.011 & 0.703 $\pm$ 0.015$^{\dagger}$ & 0.890 $\pm$ 0.009 & 0.793 & 0.457 & 0.859 \\
+Decision Tree & 0.724 $\pm$ 0.015 & 0.651 $\pm$ 0.016 & 0.809 $\pm$ 0.015 & 0.736 & 0.394 & 0.822 \\
+Random Forest & 0.773 $\pm$ 0.009 & 0.689 $\pm$ 0.011 & 0.889 $\pm$ 0.008 & 0.791 & 0.423 & 0.854 \\
+SVM (RBF) & 0.766 $\pm$ 0.010 & 0.688 $\pm$ 0.015 & 0.877 $\pm$ 0.009 & 0.781 & 0.433 & 0.849 \\
+Gradient Boosting & 0.774 $\pm$ 0.011 & 0.705 $\pm$ 0.015$^{\dagger}$ & 0.893 $\pm$ 0.007 & 0.788 & 0.470 & 0.855 \\
+XGBoost & \textbf{0.781 $\pm$ 0.009} & \textbf{0.712 $\pm$ 0.013} & \textbf{0.898 $\pm$ 0.006} & \textbf{0.794} & \textbf{0.483} & \textbf{0.859} \\
+LightGBM & 0.779 $\pm$ 0.009 & 0.710 $\pm$ 0.012$^{\dagger}$ & 0.894 $\pm$ 0.006 & 0.794 & 0.479 & 0.859 \\
+MLP & 0.773 $\pm$ 0.015 & 0.698 $\pm$ 0.023$^{\dagger}$ & 0.888 $\pm$ 0.010 & 0.792 & 0.450 & 0.853 \\
+\bottomrule
+\end{tabular}
+\par\smallskip\footnotesize Mean $\pm$ SD over 25 test folds (5-fold CV repeated 5 times); class-wise F1 columns show the mean only. Bold: best value. $^{\dagger}$: not significantly different from the best model on that metric (corrected resampled $t$-test, $p\ge 0.05$).
+\end{table}

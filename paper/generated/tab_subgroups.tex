@@ -1,0 +1,22 @@
+\begin{table}[t]
+\centering
+\small
+\setlength{\tabcolsep}{3.5pt}
+\footnotesize
+\caption{Subgroup results for the best three-class model (out-of-fold predictions for all 4{{,}}424 students, first CV repeat). Brackets: 95\% bootstrap intervals.}
+\label{tab:subgroups}
+\begin{tabular}{llrcccc}
+\toprule
+Attribute & Group & $n$ & Dropout rate & Dropout recall & False alert rate & Macro F1 \\
+\midrule
+Gender & Female & 2{,}868 & 0.25 & 0.74 [0.70, 0.77] & 0.05 [0.04, 0.06] & 0.72 [0.70, 0.74] \\
+ & Male & 1{,}556 & 0.45 & 0.80 [0.76, 0.83] & 0.15 [0.13, 0.17] & 0.69 [0.66, 0.71] \\
+Scholarship & No & 3{,}325 & 0.39 & 0.79 [0.76, 0.81] & 0.10 [0.09, 0.11] & 0.71 [0.69, 0.73] \\
+ & Yes & 1{,}099 & 0.12 & 0.57 [0.49, 0.66] & 0.03 [0.02, 0.04] & 0.67 [0.63, 0.71] \\
+Age at enrolment & $\le$20 & 2{,}551 & 0.21 & 0.64 [0.60, 0.68] & 0.05 [0.04, 0.06] & 0.70 [0.68, 0.72] \\
+ & 21--25 & 828 & 0.36 & 0.75 [0.70, 0.80] & 0.12 [0.09, 0.15] & 0.70 [0.67, 0.73] \\
+ & $>$25 & 1{,}045 & 0.56 & 0.89 [0.86, 0.91] & 0.13 [0.10, 0.16] & 0.69 [0.66, 0.72] \\
+\bottomrule
+\end{tabular}
+\par\smallskip\footnotesize Dropout recall: share of actual dropouts predicted as Dropout. False alert rate: share of non-dropouts predicted as Dropout.
+\end{table}
