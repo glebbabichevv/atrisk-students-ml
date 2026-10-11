@@ -39,3 +39,11 @@
 - Class-wise F1 and Dropout-vs-rest AUC reported.
 - Calibration (reliability curves, ECE, Brier).
 - Subgroup analysis: dropout recall and false-alert rate with bootstrap CIs, including age groups.
+
+## Added in the second round
+
+- Alert lists of fixed size (top 5-50% of the cohort): precision and reach at each prediction point.
+- Group-specific thresholds (scholarship, age), cross-fitted, compared with one global threshold.
+- Sensitivity analysis without the fee-status variables, whose recording time is undocumented (87% of students behind on fees drop out, so possible leakage).
+- Nested hyperparameter tuning for LR, RF, XGBoost and LightGBM: no significant change.
+- Appendix: full tables at enrolment and after the first semester, SHAP for the Enrolled class, hyperparameter table.

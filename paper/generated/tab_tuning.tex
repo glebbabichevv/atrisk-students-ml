@@ -1,0 +1,18 @@
+\begin{table}[t]
+\centering
+\small
+\caption{Fixed hyperparameters vs.\ nested tuning (randomised search, inner 3-fold CV on macro F1) in the three-class setting. Mean $\pm$ SD over 10 outer folds; $p$: corrected resampled $t$-test, tuned vs.\ fixed.}
+\label{tab:tuning}
+\begin{tabular}{lcccccc}
+\toprule
+ & \multicolumn{3}{c}{Macro F1} & \multicolumn{3}{c}{Macro AUC} \\
+\cmidrule(lr){2-4}\cmidrule(lr){5-7}
+Model & Fixed & Tuned & $p$ & Fixed & Tuned & $p$ \\
+\midrule
+Logistic Regression & 0.703 $\pm$ 0.011 & 0.703 $\pm$ 0.012 & 0.82 & 0.890 & 0.890 & 0.42 \\
+Random Forest & 0.689 $\pm$ 0.012 & 0.694 $\pm$ 0.022 & 0.45 & 0.888 & 0.886 & 0.22 \\
+XGBoost & 0.706 $\pm$ 0.016 & 0.708 $\pm$ 0.017 & 0.67 & 0.896 & 0.895 & 0.62 \\
+LightGBM & 0.704 $\pm$ 0.017 & 0.705 $\pm$ 0.017 & 0.90 & 0.892 & 0.894 & 0.28 \\
+\bottomrule
+\end{tabular}
+\end{table}

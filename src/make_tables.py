@@ -97,6 +97,14 @@ def cols_meta(cols):
 
 results_table("binary", ["accuracy", "f1", "auc"],
               "Binary setting (Dropout vs.\\ Graduate, $n=3{,}630$).", "tab:binary")
+results_table("sem1", ["accuracy", "f1", "auc", "f1_dropout", "f1_enrolled",
+                       "f1_graduate"],
+              "Three-class setting with first-semester records only (30 features).",
+              "tab:sem1")
+results_table("enrol", ["accuracy", "f1", "auc", "f1_dropout", "f1_enrolled",
+                        "f1_graduate"],
+              "Three-class setting with information available at enrolment (24 features).",
+              "tab:enrol")
 results_table("multiclass", ["accuracy", "f1", "auc", "f1_dropout", "f1_enrolled",
                              "f1_graduate"],
               "Three-class setting with first- and second-semester records "
@@ -252,3 +260,170 @@ with open(GEN / "numbers.tex", "w") as fh:
     for k, v in sorted(macros.items()):
         fh.write(f"\\newcommand{{\\{k}}}{{{v}}}\n")
 print(f"{len(macros)} macros written")
+
+
+# ── decision analyses (decision.py, sensitivity.py, tuning.py) ───────────────
+D = json.load(open(RES / "decision.json"))
+SENS = json.load(open(RES / "sensitivity.json"))
+STAGE_LABEL = {"enrol": "Enrolment", "sem1": "1st semester", "multiclass": "2nd semester"}
+WORD = {"enrol": "Enrol", "sem1": "Semone", "multiclass": "Full"}
+
+
+def cap_row(rows, cap):
+    return next(r for r in rows if abs(r["capacity"] - cap) < 1e-9)
+
+
+def alert_table():
+    lines = [r"\begin{table}[t]", r"\centering", r"\small",
+             r"\setlength{\tabcolsep}{4pt}",
+             r"\caption{Alert lists of fixed size. Students are ranked by the "
+             r"out-of-fold XGBoost probability of dropout; the top 10\% or 20\% of the "
+             r"cohort are flagged. Precision: share of flagged students who drop out "
+             r"(95\% bootstrap interval). Reach: share of all dropouts who are flagged.}",
+             r"\label{tab:alerts}", r"\begin{tabular}{llcccc}", r"\toprule",
+             r" & & \multicolumn{2}{c}{Top 10\%} & \multicolumn{2}{c}{Top 20\%} \\",
+             r"\cmidrule(lr){3-4}\cmidrule(lr){5-6}",
+             r"Prediction point & Features & Precision & Reach & Precision & Reach \\",
+             r"\midrule"]
+    for s in ["enrol", "sem1", "multiclass"]:
+        for key, lab in [(s, "all"), (s + "_nofee", "without fee status")]:
+            a, b = cap_row(D["alert_lists"][key], 0.10), cap_row(D["alert_lists"][key], 0.20)
+            ci = lambda r: f"[{r['precision_ci'][0]:.2f}, {r['precision_ci'][1]:.2f}]"  # noqa: E731
+            first = STAGE_LABEL[s] if lab == "all" else ""
+            lines.append(f"{first} & {lab} & {a['precision']:.2f} {ci(a)} & {a['recall']:.2f} & "
+                         f"{b['precision']:.2f} {ci(b)} & {b['recall']:.2f} \\\\")
+    base = D["base_rate"]
+    lines += [r"\bottomrule", r"\end{tabular}",
+              rf"\par\smallskip\footnotesize Dropout base rate {base:.2f}. A random "
+              r"list has precision equal to the base rate and reaches 10\% or 20\% of "
+              r"dropouts.", r"\end{table}"]
+    (GEN / "tab_alerts.tex").write_text("\n".join(lines) + "\n")
+
+
+alert_table()
+for key, rows in D["alert_lists"].items():
+    s = key.replace("_nofee", "")
+    suffix = "Nofee" if key.endswith("_nofee") else ""
+    for cap, cw in [(0.10, "Ten"), (0.20, "Twenty")]:
+        r = cap_row(rows, cap)
+        m(f"alert{WORD[s]}{suffix}P{cw}", f"{r['precision']:.2f}")
+        m(f"alert{WORD[s]}{suffix}R{cw}", f"{r['recall']:.2f}")
+        m(f"alert{WORD[s]}{suffix}Lift{cw}", f"{r['lift']:.1f}")
+        m(f"alert{WORD[s]}{suffix}PPct{cw}", f"{100 * r['precision']:.0f}\\%")
+        m(f"alert{WORD[s]}{suffix}RPct{cw}", f"{100 * r['recall']:.0f}\\%")
+m("baseRate", f"{D['base_rate']:.2f}")
+# perfect ranking reach at 20%
+m("perfectReachTwenty", f"{min(1, 0.20 / D['base_rate']):.2f}")
+m("perfectReachTen", f"{100 * min(1, 0.10 / D['base_rate']):.0f}\\%")
+for k_, v_ in D["top_profile"].items():
+    m("profile" + "".join(w.capitalize() for w in k_.replace("10", "ten").split("_")),
+      f"{100 * v_:.0f}")
+
+
+def threshold_table():
+    lines = [r"\begin{table}[t]", r"\centering", r"\small",
+             r"\setlength{\tabcolsep}{4pt}",
+             r"\caption{One threshold for everyone vs.\ group-specific thresholds that "
+             r"give each group the same dropout recall (XGBoost, both semesters). The single threshold flags 20\% "
+             r"of students. Thresholds are chosen on four folds of students and applied "
+             r"to the fifth (cross-fitting).}",
+             r"\label{tab:thresholds}", r"\begin{tabular}{llrcccc}", r"\toprule",
+             r" & & & \multicolumn{2}{c}{Single threshold} & "
+             r"\multicolumn{2}{c}{Group thresholds} \\",
+             r"\cmidrule(lr){4-5}\cmidrule(lr){6-7}",
+             r"Attribute & Group & $n$ & Recall & False alerts & Recall & False alerts \\",
+             r"\midrule"]
+    for t in D["thresholds"]:
+        single = {r["group"]: r for r in t["rows"] if r["policy"] == "single"}
+        group = {r["group"]: r for r in t["rows"] if r["policy"] == "per-group"}
+        first = True
+        for gname in single:
+            a, b = single[gname], group[gname]
+            g = (gname.replace("<=", r"$\le$").replace(">", "$>$").replace("21-25", "21--25"))
+            if gname == "All":
+                g = r"\emph{All}"
+            lines.append(f"{t['attribute'] if first else ''} & {g} & {a['n']:,} & "
+                         f"{a['recall']:.2f} & {a['fpr']:.3f} & {b['recall']:.2f} & "
+                         f"{b['fpr']:.3f} \\\\".replace(",", "{,}").replace("{,} ", ", "))
+            first = False
+        if t is not D["thresholds"][-1]:
+            lines.append(r"\addlinespace")
+    lines += [r"\bottomrule", r"\end{tabular}",
+              r"\par\smallskip\footnotesize False alerts: share of students who do not "
+              r"drop out but are flagged.", r"\end{table}"]
+    (GEN / "tab_thresholds.tex").write_text("\n".join(lines) + "\n")
+
+
+threshold_table()
+for t in D["thresholds"]:
+    a = macro_name(t["attribute"])
+    for r in t["rows"]:
+        gk = macro_name(r["group"].replace("<=", "le").replace(">", "gt").replace("-", "to")
+                        .replace("21", "twentyone").replace("25", "twentyfive")
+                        .replace("20", "twenty"))
+        pk = "Single" if r["policy"] == "single" else "Group"
+        m(f"thr{a}{gk}{pk}Recall", f"{r['recall']:.2f}")
+        m(f"thr{a}{gk}{pk}Fpr", f"{r['fpr']:.3f}")
+        m(f"thr{a}{gk}{pk}Alerts", f"{r['alerts']:,}".replace(",", "{,}"))
+        if "precision" in r:
+            m(f"thr{a}{gk}{pk}Precision", f"{r['precision']:.2f}")
+
+
+def sensitivity_table():
+    lines = [r"\begin{table}[t]", r"\centering", r"\small",
+             r"\setlength{\tabcolsep}{4pt}",
+             r"\caption{Sensitivity to the two fee-status variables (\emph{Debtor}, "
+             r"\emph{Tuition fees up to date}), whose recording time is not documented. "
+             r"Three-class setting, mean $\pm$ SD over 25 folds.}",
+             r"\label{tab:sensitivity}", r"\begin{tabular}{llcccc}", r"\toprule",
+             r" & & \multicolumn{2}{c}{With fee status} & "
+             r"\multicolumn{2}{c}{Without fee status} \\",
+             r"\cmidrule(lr){3-4}\cmidrule(lr){5-6}",
+             r"Prediction point & Model & Macro F1 & AUC Dropout & Macro F1 & AUC Dropout \\",
+             r"\midrule"]
+    for s in ["enrol", "sem1", "multiclass"]:
+        for k, model in enumerate(["XGBoost", "Logistic Regression"]):
+            a = next(r for r in SENS if r["stage"] == s and r["model"] == model and r["fees"])
+            b = next(r for r in SENS if r["stage"] == s and r["model"] == model and not r["fees"])
+            f = lambda r, c: f"{r[c]:.3f} $\\pm$ {r[c + '_sd']:.3f}"  # noqa: E731
+            lines.append(f"{STAGE_LABEL[s] if k == 0 else ''} & {model} & {f(a, 'f1')} & "
+                         f"{f(a, 'auc_dropout')} & {f(b, 'f1')} & {f(b, 'auc_dropout')} \\\\")
+    lines += [r"\bottomrule", r"\end{tabular}", r"\end{table}"]
+    (GEN / "tab_sensitivity.tex").write_text("\n".join(lines) + "\n")
+
+
+sensitivity_table()
+for r in SENS:
+    key = f"sens{WORD[r['stage']]}{macro_name(r['model'])}{'Fees' if r['fees'] else 'Nofee'}"
+    m(key + "F", f3(r["f1"]))
+    m(key + "Auc", f3(r["auc_dropout"]))
+
+TUNE_PATH = RES / "tuning.json"
+if TUNE_PATH.exists():
+    TU = json.load(open(TUNE_PATH))
+    lines = [r"\begin{table}[t]", r"\centering", r"\small",
+             r"\caption{Fixed hyperparameters vs.\ nested tuning (randomised search, "
+             r"inner 3-fold CV on macro F1) in the three-class setting. Mean $\pm$ SD "
+             r"over 10 outer folds; $p$: corrected resampled $t$-test, tuned vs.\ fixed.}",
+             r"\label{tab:tuning}", r"\begin{tabular}{lcccccc}", r"\toprule",
+             r" & \multicolumn{3}{c}{Macro F1} & \multicolumn{3}{c}{Macro AUC} \\",
+             r"\cmidrule(lr){2-4}\cmidrule(lr){5-7}",
+             r"Model & Fixed & Tuned & $p$ & Fixed & Tuned & $p$ \\", r"\midrule"]
+    for name, r in TU.items():
+        f, a = r["f1"], r["auc"]
+        lines.append(f"{name} & {f['fixed']:.3f} $\\pm$ {f['fixed_sd']:.3f} & "
+                     f"{f['tuned']:.3f} $\\pm$ {f['tuned_sd']:.3f} & {f['p']:.2f} & "
+                     f"{a['fixed']:.3f} & {a['tuned']:.3f} & {a['p']:.2f} \\\\")
+        m(f"tune{macro_name(name)}Fixed", f3(f["fixed"]))
+        m(f"tune{macro_name(name)}Tuned", f3(f["tuned"]))
+        m(f"tune{macro_name(name)}P", f"{f['p']:.2f}")
+    lines += [r"\bottomrule", r"\end{tabular}", r"\end{table}"]
+    (GEN / "tab_tuning.tex").write_text("\n".join(lines) + "\n")
+    m("tuneMaxGain", f3(max(r["f1"]["diff"] for r in TU.values())))
+    m("tuneMinP", f"{min(r['f1']['p'] for r in TU.values()):.2f}")
+
+with open(GEN / "numbers.tex", "w") as fh:
+    fh.write("% Auto-generated by src/make_tables.py. Do not edit by hand.\n")
+    for k, v in sorted(macros.items()):
+        fh.write(f"\\newcommand{{\\{k}}}{{{v}}}\n")
+print(f"{len(macros)} macros written (with decision analyses)")

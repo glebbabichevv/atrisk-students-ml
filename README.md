@@ -14,7 +14,7 @@ Download the CSV from the UCI page and save it as `data/dataset.csv`. The semico
 
 ```bash
 pip install -r requirements.txt
-python run_all.py                 # ~15 min on 2 cores
+python run_all.py                 # ~50 min on 2 cores
 cd paper && latexmk -pdf main.tex
 ```
 
@@ -23,6 +23,9 @@ cd paper && latexmk -pdf main.tex
 | `src/data.py` | loading, column clean-up, the four settings (binary, three-class, first semester, enrolment) |
 | `src/experiments.py` | 8 models x 4 settings, 5-fold CV repeated 5 times, corrected resampled t-tests |
 | `src/analysis.py` | calibration, subgroup errors with bootstrap CIs, feature selection inside CV, SHAP, all figures |
+| `src/sensitivity.py` | repeats the three-class analysis without the two fee-status variables |
+| `src/decision.py` | fixed-size alert lists (precision and reach) and group-specific thresholds (cross-fitted) |
+| `src/tuning.py` | nested CV with randomised search for four models |
 | `src/make_tables.py` | writes `paper/generated/` (tables and `\newcommand` number macros) |
 
 ## Main results
@@ -33,6 +36,8 @@ cd paper && latexmk -pdf main.tex
 | Three-class, both semesters | 0.712 (XGBoost) | F1: Dropout 0.794, Enrolled 0.483, Graduate 0.859; Dropout AUC 0.926 |
 | Three-class, first semester | 0.673 | Dropout AUC 0.905 |
 | Three-class, enrolment only | 0.551 | Dropout AUC 0.817 |
+
+After one semester, a list of the 20% highest-risk students reaches 57% of eventual dropouts with 92% precision. Group-specific thresholds raise dropout recall for scholarship holders from 0.37 to 0.57 at almost no cost in precision. Nested tuning does not change any result significantly.
 
 ## Licence
 

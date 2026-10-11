@@ -40,8 +40,16 @@ def load_dataset(path: Path | str = DATA_PATH) -> pd.DataFrame:
     return df
 
 
+FEE_COLS = ["Debtor", "Tuition fees up to date"]
+
+
 def feature_columns(df: pd.DataFrame, setting: str) -> list[str]:
+    """Settings: binary, multiclass, sem1, enrol; a "_nofee" suffix also drops the
+    two fee-status variables, whose recording time is not documented."""
     cols = [c for c in df.columns if c != "Target"]
+    if setting.endswith("_nofee"):
+        cols = [c for c in cols if c not in FEE_COLS]
+        setting = setting[: -len("_nofee")]
     if setting in ("sem1", "enrol"):
         cols = [c for c in cols if "2nd sem" not in c]
     if setting == "enrol":
@@ -55,7 +63,7 @@ def setting_xy(df: pd.DataFrame, setting: str):
     Labels: Dropout=0 in every setting. Binary: Dropout=0, Graduate=1.
     """
     d = df
-    if setting == "binary":
+    if setting.startswith("binary"):
         d = df[df["Target"] != "Enrolled"]
         y = (d["Target"] == "Graduate").astype(int).to_numpy()
     else:

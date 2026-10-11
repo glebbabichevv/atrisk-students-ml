@@ -10,6 +10,7 @@
 \usepackage{booktabs}
 \usepackage{caption}
 \usepackage{subcaption}
+\usepackage[section]{placeins}
 \usepackage[authoryear,round]{natbib}
 \usepackage{xcolor}
 \usepackage[colorlinks=true,linkcolor=blue!50!black,citecolor=blue!50!black,urlcolor=blue!50!black]{hyperref}
@@ -36,7 +37,7 @@
 \maketitle
 
 \begin{abstract}
-Most dropout-prediction studies on the public UCI \emph{Predict Students' Dropout and Academic Success} dataset ($N=4{,}424$) either drop the third outcome, \emph{Enrolled}, or treat it as a class whose fate is unknown. In this dataset the label is assigned at the end of the normal duration of the degree, so Enrolled students are those who neither graduated on time nor left: they are delayed. We compare eight classifiers in a binary setting (Dropout vs.\ Graduate) and in the three-class setting at three points in time (enrolment, end of the first semester, end of the second semester), using repeated stratified cross-validation and corrected resampled $t$-tests. In the binary setting, six of the seven models compared with the best one are statistically indistinguishable from it (best macro F1 \bestbinaryF). In the three-class setting, macro F1 falls to \bestmulticlassF{} (XGBoost), and most of the drop comes from the delayed group: F1 is \multiclassXGBoostfdropout{} for Dropout, \multiclassXGBoostfgraduate{} for Graduate and \multiclassXGBoostfenrolled{} for Enrolled. Dropout itself remains well ranked inside the three-class model (AUC \multiclassXGBoostaucdropout), and its predicted probabilities are well calibrated (expected calibration error \eceXGBoost). With first-semester records only, the model keeps \retainsem\% of its macro F1; with enrolment data only, \retainenrol\%. Selecting features inside the cross-validation loop did not improve on the full feature set. Subgroup analysis shows that the model misses more of the dropouts in groups where dropout is rare, for example scholarship holders (recall \subScholarshipYesTpr{} vs.\ \subScholarshipNoTpr) and students who enrolled at 20 or younger (\subAgeatenrolmentletwentyTpr{} vs.\ \subAgeatenrolmentgttwentyfiveTpr{} for those over 25). Code and all reported numbers are generated from a public repository.
+Most dropout-prediction studies on the public UCI \emph{Predict Students' Dropout and Academic Success} dataset ($N=4{,}424$) drop the third outcome, \emph{Enrolled}, or treat it as an unknown fate. The label is assigned at the end of the normal course duration, so Enrolled students are delayed: they neither graduated on time nor left. We compare eight classifiers in a binary setting and in the three-class setting at three prediction points (enrolment, first semester, second semester), using repeated cross-validation, corrected $t$-tests and nested tuning. Most models are statistically tied in both settings. In the three-class setting, macro F1 falls to \bestmulticlassF{}, mainly because of the delayed class (F1 \multiclassXGBoostfenrolled{}, against \multiclassXGBoostfdropout{} for Dropout and \multiclassXGBoostfgraduate{} for Graduate); dropout itself is still ranked well (AUC \multiclassXGBoostaucdropout) with calibrated probabilities. Used as an alert list after one semester, the top 20\% of students by predicted risk include \alertSemoneRPctTwenty{} of eventual dropouts, and \alertSemonePPctTwenty{} of the students on that list drop out. The model misses more dropouts where dropout is rare: with both semesters and a 20\% list, recall is \thrScholarshipYesSingleRecall{} for scholarship holders against \thrScholarshipNoSingleRecall{} for others; group-specific thresholds raise it to \thrScholarshipYesGroupRecall{} while overall precision moves from \thrScholarshipAllSinglePrecision{} to \thrScholarshipAllGroupPrecision. Results at enrolment depend on two fee-status variables whose recording time is undocumented; without them the dropout AUC at enrolment falls from \sensEnrolXGBoostFeesAuc{} to \sensEnrolXGBoostNofeeAuc. All numbers are generated from a public repository.
 \end{abstract}
 
 \noindent\textbf{Keywords:} student dropout, delayed completion, early warning systems, educational data mining, model evaluation, calibration, algorithmic fairness
@@ -61,9 +62,10 @@ This paper revisits the benchmark with these three points in mind. We ask:
   \item[RQ2] What happens when delayed (Enrolled) students are kept as a third class, and which part of the problem becomes harder?
   \item[RQ3] How much predictive performance is available at enrolment and after the first semester?
   \item[RQ4] Are the predicted dropout probabilities calibrated, and do error rates differ between student subgroups?
+  \item[RQ5] How useful are the scores when an institution can contact only a fixed share of students, and what does it cost to give every subgroup the same dropout recall?
 \end{description}
 
-Our contributions are: (i) a re-reading of the Enrolled label as delayed completion, with per-class results showing that the drop in macro F1 in the three-class setting comes from this class rather than from dropout detection; (ii) a comparison of eight classifiers under repeated cross-validation with corrected significance tests, which shows that most published rankings on this dataset are not statistically supported; (iii) a staged analysis from enrolment to the end of the first year; (iv) calibration and subgroup error analyses, including the finding that recall is lowest in groups with low base rates of dropout; and (v) a repository in which every number in the paper is produced by code.
+Our contributions are: (i) a re-reading of the Enrolled label as delayed completion, with per-class results showing that the drop in macro F1 in the three-class setting comes from this class rather than from dropout detection; (ii) a comparison of eight classifiers under repeated cross-validation with corrected significance tests, which shows that most published rankings on this dataset are not statistically supported; (iii) a staged analysis from enrolment to the end of the first year; (iv) calibration and subgroup error analyses, including the finding that recall is lowest in groups with low base rates of dropout; (v) a decision-oriented evaluation of fixed-size alert lists and of group-specific thresholds; (vi) checks of two threats to validity, namely fee-status variables of uncertain timing and untuned hyperparameters; and (vii) a repository in which every number in the paper is produced by code.
 
 \section{Related work}
 \label{sec:related}
@@ -100,6 +102,14 @@ The outcome is recorded at the end of the normal duration of the course \citep{r
 
 \paragraph{Subgroups.} With the same out-of-fold predictions from the best three-class model, we compare gender, scholarship status and age at enrolment ($\le 20$, 21--25, $>25$). For each group we report dropout recall (the share of actual dropouts predicted as Dropout), the false-alert rate (the share of other students predicted as Dropout) and macro F1, with 95\% bootstrap intervals from 1{,}000 resamples within the group. Gender and scholarship status are themselves model inputs; we analyse errors, not the causal role of these attributes.
 
+\paragraph{Alert lists.} Advising capacity is usually fixed in advance, so we also evaluate the scores as ranked lists. Students are sorted by their out-of-fold XGBoost probability of dropout, and the top $c\%$ of the cohort are flagged for $c$ between 5 and 50. We report precision (the share of flagged students who drop out) and reach (the share of all dropouts who are flagged), with 95\% bootstrap intervals, at each of the three prediction points.
+
+\paragraph{Group-specific thresholds.} Using the scores of the model with both semesters, a single threshold that flags 20\% of the cohort is compared with group-specific thresholds chosen so that, within each group, the same share of dropouts is flagged as under the single threshold overall. To avoid choosing a threshold with the same students it is evaluated on, we cross-fit: students are split into five folds stratified by outcome and group, thresholds are set on four folds and applied to the fifth.
+
+\paragraph{Fee-status variables.} Two inputs, \emph{Debtor} and \emph{Tuition fees up to date}, are among the strongest predictors, and 87\% of students whose fees are not up to date drop out. The dataset documentation does not say when these variables were recorded. If they reflect the situation after a student stopped attending, they partly encode the outcome. We therefore repeat the three-class analysis at each prediction point without them, for XGBoost and logistic regression.
+
+\paragraph{Hyperparameter tuning.} To check that fixed hyperparameters do not drive the comparison, we run nested cross-validation for four models in the three-class setting: an outer stratified 5-fold CV repeated twice, and inside each outer training set a randomised search (12 to 20 configurations, 3-fold CV, macro F1). Tuned and fixed versions are compared on the same outer folds with the corrected $t$-test.
+
 \paragraph{Feature selection.} To test whether a smaller feature set suffices, we place ANOVA-$F$ feature selection inside the model pipeline, so that features are chosen on the training part of each fold, and evaluate $k\in\{5,10,15,20,25,30,36\}$ with 5-fold cross-validation repeated three times.
 
 \paragraph{Explanations.} We compute SHAP values \citep{lundberg2017} with the TreeExplainer \citep{lundberg2020} for the XGBoost three-class model trained on a stratified 80\% split and explained on the remaining 20\% (macro F1 on that split: \shapXgbF). SHAP values are in log-odds units for each class. Because XGBoost is also the best model in the main comparison, no proxy model is needed.
@@ -130,6 +140,10 @@ Dropout detection, the task most institutions care about, is much less affected.
 
 \input{generated/tab_multiclass}
 
+\paragraph{Tuning.} Nested tuning does not change this picture (Table~\ref{tab:tuning}). For none of the four tuned models is the tuned version significantly different from the fixed one in macro F1 (smallest $p=\tuneMinP$, largest mean gain \tuneMaxGain). The ties between models reported above are therefore not an artefact of untuned hyperparameters.
+
+\input{generated/tab_tuning}
+
 \begin{figure}[t]
   \centering
   \begin{subfigure}[t]{0.46\linewidth}
@@ -153,6 +167,10 @@ Dropout detection, the task most institutions care about, is much less affected.
 Table~\ref{tab:stages} and Figure~\ref{fig:perclass} follow the three-class problem through time. With enrolment data only, the best macro F1 is \stageEnrolF{} and the Dropout AUC \stageEnrolAucDrop. Adding first-semester records raises these to \stageSemoneF{} and \stageSemoneAucDrop; adding the second semester gives \stageFullF{} and \stageFullAucDrop. XGBoost keeps \retainsem\% of its full macro F1 with first-semester data and \retainenrol\% with enrolment data only. Most of the information arrives with the first semester. The delayed class benefits most from the second semester (F1 from \stageSemoneFenrolled{} to \stageFullFenrolled), which fits the idea that delay builds up through units that are not passed in the second semester. A first-semester model is therefore a reasonable basis for intervention one semester earlier, while a model at enrolment ranks dropout risk moderately well (AUC \stageEnrolAucDrop) but should only be used to direct low-cost support.
 
 \input{generated/tab_stages}
+
+\paragraph{Fee-status variables.} Table~\ref{tab:sensitivity} repeats the three-class analysis without \emph{Debtor} and \emph{Tuition fees up to date}. Their contribution is largest at enrolment, where the Dropout AUC of XGBoost falls from \sensEnrolXGBoostFeesAuc{} to \sensEnrolXGBoostNofeeAuc{} and macro F1 from \sensEnrolXGBoostFeesF{} to \sensEnrolXGBoostNofeeF. After the first semester the loss is smaller (AUC \sensSemoneXGBoostFeesAuc{} to \sensSemoneXGBoostNofeeAuc), and with both semesters it is \sensFullXGBoostFeesAuc{} to \sensFullXGBoostNofeeAuc. Logistic regression shows the same pattern. The enrolment-stage results above should therefore be read as an upper bound: if fee status is only known later, a model built strictly on information available at enrolment reaches a Dropout AUC of about \sensEnrolXGBoostNofeeAuc. The conclusions about the delayed class and about model rankings do not depend on these two variables.
+
+\input{generated/tab_sensitivity}
 
 \subsection{Calibration (RQ4)}
 
@@ -190,6 +208,25 @@ In each case the model is more sensitive in the group where dropout is common an
   \label{fig:subgroups}
 \end{figure}
 
+\subsection{Alert lists and thresholds (RQ5)}
+
+Figure~\ref{fig:alerts} and Table~\ref{tab:alerts} show what happens when the scores are used to choose whom to contact. After the first semester, \alertSemonePPctTen{} of the students in the top 10\% of the ranking later drop out, \alertSemoneLiftTen{} times the base rate of \baseRate. This list reaches \alertSemoneRPctTen{} of all dropouts, close to the maximum possible, since a list of that size can hold at most \perfectReachTen{} of them. A list of the top 20\% reaches \alertSemoneRPctTwenty{} of dropouts, and \alertSemonePPctTwenty{} of the students on it drop out. Adding the second semester changes these figures little (\alertFullRPctTwenty{} reached at 20\%), so for list-based advising most of the value is available one semester earlier. At enrolment, a 20\% list reaches \alertEnrolRPctTwenty{} of dropouts (precision \alertEnrolPPctTwenty), or \alertEnrolNofeeRPctTwenty{} (precision \alertEnrolNofeePPctTwenty) without the fee-status variables.
+
+The high precision at the top of the list also shows a limit. In the first-semester model, \profileToptenZeroApproved\% of the top 10\% passed no first-semester unit at all (against \profileAllZeroApproved\% of all students) and \profileToptenFeesNotUpToDate\% were behind on fees. An adviser looking at grades and payments would find most of these students without a model. The added value of a model lies further down the ranking, where risk is less obvious: in the next 10\%, only \profileNexttenZeroApproved\% passed no unit, and precision is lower.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{fig_alert_lists}
+  \caption{Fixed-size alert lists at three prediction points (XGBoost, out-of-fold). Left: share of all dropouts reached as more students are contacted, against a random list and a perfect ranking. Right: share of contacted students who drop out, with 95\% bootstrap intervals. Dotted lines: models without the two fee-status variables.}
+  \label{fig:alerts}
+\end{figure}
+
+\input{generated/tab_alerts}
+
+Table~\ref{tab:thresholds} turns the subgroup finding of the previous section into a policy comparison at a 20\% list. With one threshold for everyone, \thrScholarshipYesSingleRecall{} of dropouts among scholarship holders are flagged, against \thrScholarshipNoSingleRecall{} among other students. Group-specific thresholds raise the scholarship holders' recall to \thrScholarshipYesGroupRecall{}. Overall recall is unchanged (\thrScholarshipAllGroupRecall), the list grows from \thrScholarshipAllSingleAlerts{} to \thrScholarshipAllGroupAlerts{} students, and overall precision falls from \thrScholarshipAllSinglePrecision{} to \thrScholarshipAllGroupPrecision. Equalising recall across age groups costs more: students aged 20 or younger go from \thrAgeatenrolmentletwentySingleRecall{} to \thrAgeatenrolmentletwentyGroupRecall, the list grows from \thrAgeatenrolmentAllSingleAlerts{} to \thrAgeatenrolmentAllGroupAlerts{} students and precision falls from \thrAgeatenrolmentAllSinglePrecision{} to \thrAgeatenrolmentAllGroupPrecision. In both cases, the gap in recall can be closed at a modest cost in false alerts. Whether to do so is a policy choice; the point is that the cost can be measured before deciding.
+
+\input{generated/tab_thresholds}
+
 \subsection{Features}
 
 \paragraph{Feature selection.} With selection performed inside cross-validation, no reduced feature set improved on all 36 features (Figure~\ref{fig:fs}; macro F1 \fsFull). Keeping 30 features (\fsKthreezero) stays within one standard deviation of the full model; keeping 20 gives \fsKtwozero{} and keeping 10 gives \fsKonezero. A selection step evaluated on the test split can make small feature sets look as good as the full set; this does not hold up when the selection is part of the training procedure.
@@ -219,15 +256,18 @@ In each case the model is more sensitive in the group where dropout is common an
 
 \paragraph{Which model.} Five of the eight models are statistically tied in three-class macro F1, and seven of the eight in the binary setting. Logistic regression is among the tied models in both, has calibrated probabilities and is easy to explain to advisers. Boosted trees give small but consistent AUC gains. A choice between them can reasonably be made on interpretability and maintenance rather than on accuracy. This agrees with the general finding that tree ensembles are strong on tabular data \citep{grinsztajn2022}, but here the margin over a well-specified linear model is small.
 
+\paragraph{Using the scores.} For an institution, the useful output is not a class label but a ranked list. After one semester, a list covering a fifth of the cohort reaches more than half of eventual dropouts with few false alerts, and calibrated probabilities make it possible to choose the list size from the expected number of dropouts. Because a single threshold under-serves groups where dropout is rare, the list should be checked by group, and group-specific thresholds are a cheap correction where equal recall is the goal.
+
 \paragraph{Reporting.} Three practices would make results on this benchmark easier to compare: reporting class-wise scores alongside macro averages, using repeated cross-validation with corrected tests instead of one split, and performing feature selection and resampling inside the training folds.
 
-\paragraph{Limitations.} The data come from one institution and cover cohorts up to 2018/19, so the results may not transfer to other institutions or to later cohorts; external validation is the most important next step. Hyperparameters were fixed rather than tuned; nested tuning might change the ranking within the group of tied models but is unlikely to remove the gap for the delayed class. We did not use resampling methods such as SMOTE; they can raise recall for the delayed class at the cost of precision and calibration. The subgroup analysis uses three attributes and does not consider intersections. Finally, the predictors are semester summaries; finer-grained data could help with the delayed class in particular.
+\paragraph{Limitations.} The data come from one institution and cover cohorts up to 2018/19, so the results may not transfer to other institutions or to later cohorts; external validation is the most important next step. The recording time of the fee-status variables is not documented; we report results with and without them, but the enrolment-stage results depend on this choice. We did not use resampling methods such as SMOTE; they can raise recall for the delayed class at the cost of precision and calibration. The subgroup analysis uses three attributes and does not consider intersections. Finally, the predictors are semester summaries; finer-grained data could help with the delayed class in particular.
 
 \section{Conclusion}
 \label{sec:conclusion}
 
-On the UCI dropout benchmark, binary results overstate how well a deployed model separates students, most model rankings are within noise, and the main difficulty of the three-class problem lies in identifying delayed students rather than dropouts. Dropout itself can be ranked well after one semester (AUC \stageSemoneAucDrop) with calibrated probabilities. Recall is lower in groups where dropout is rare, which institutions should take into account when they turn scores into alert lists.
+On the UCI dropout benchmark, binary results overstate how well a deployed model separates students, most model rankings are within noise, and the main difficulty of the three-class problem lies in identifying delayed students rather than dropouts. Dropout itself can be ranked well after one semester (AUC \stageSemoneAucDrop) with calibrated probabilities. As alert lists, the scores are useful one semester in: a list of a fifth of the cohort reaches more than half of eventual dropouts. Recall is lower in groups where dropout is rare, and group-specific thresholds close this gap at a modest cost in false alerts.
 
+\FloatBarrier
 \section*{Data and code availability}
 The dataset is available from the UCI Machine Learning Repository (DOI 10.24432/C5MC89) under a CC BY 4.0 licence. Code, figures and the scripts that generate every table and number in this paper are at \url{https://github.com/glebbabichevv/atrisk-students-ml}.
 
@@ -236,5 +276,43 @@ AI assistants were used to help review the code and edit the text. The author de
 
 \bibliographystyle{plainnat}
 \bibliography{references}
+
+\clearpage
+\appendix
+\section{Additional results}
+\label{app:extra}
+
+Tables~\ref{tab:sem1} and~\ref{tab:enrol} give results for all eight models at the two earlier prediction points. Figure~\ref{fig:shapenrolled} shows SHAP values for the Enrolled class: students who take more assessments but have fewer units approved are pushed towards Enrolled, consistent with delayed rather than abandoned studies. Parents' occupations and course are nominal codes, so their colour scales have no order. Table~\ref{tab:hyper} lists the fixed hyperparameters used in the main comparison.
+
+\input{generated/tab_sem1}
+\input{generated/tab_enrol}
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.85\linewidth]{fig_shap_enrolled}
+  \caption{SHAP values for the Enrolled class (XGBoost, held-out 20\% split).}
+  \label{fig:shapenrolled}
+\end{figure}
+
+\begin{table}[ht]
+\centering
+\small
+\caption{Fixed hyperparameters (all other settings are library defaults; random seed 42).}
+\label{tab:hyper}
+\begin{tabular}{ll}
+\toprule
+Model & Hyperparameters \\
+\midrule
+Logistic regression & L2 penalty, $C=1$, lbfgs, max.\ 2000 iterations \\
+Decision tree & max.\ depth 10, min.\ 5 samples per leaf \\
+Random forest & 300 trees, min.\ 2 samples per leaf \\
+SVM & RBF kernel, $C=10$, $\gamma=$ scale, Platt probabilities \\
+Gradient boosting & 200 trees, learning rate 0.05, max.\ depth 5 \\
+XGBoost & 300 trees, learning rate 0.05, max.\ depth 5, subsample 0.8, column sample 0.8 \\
+LightGBM & 300 trees, learning rate 0.05, 31 leaves, subsample 0.8, column sample 0.8 \\
+MLP & layers (256, 128, 64), ReLU, Adam, early stopping, max.\ 500 epochs \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \end{document}

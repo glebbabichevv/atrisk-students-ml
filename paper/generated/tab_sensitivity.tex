@@ -1,0 +1,21 @@
+\begin{table}[t]
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\caption{Sensitivity to the two fee-status variables (\emph{Debtor}, \emph{Tuition fees up to date}), whose recording time is not documented. Three-class setting, mean $\pm$ SD over 25 folds.}
+\label{tab:sensitivity}
+\begin{tabular}{llcccc}
+\toprule
+ & & \multicolumn{2}{c}{With fee status} & \multicolumn{2}{c}{Without fee status} \\
+\cmidrule(lr){3-4}\cmidrule(lr){5-6}
+Prediction point & Model & Macro F1 & AUC Dropout & Macro F1 & AUC Dropout \\
+\midrule
+Enrolment & XGBoost & 0.550 $\pm$ 0.013 & 0.822 $\pm$ 0.011 & 0.512 $\pm$ 0.012 & 0.770 $\pm$ 0.012 \\
+ & Logistic Regression & 0.542 $\pm$ 0.012 & 0.823 $\pm$ 0.014 & 0.510 $\pm$ 0.012 & 0.770 $\pm$ 0.014 \\
+1st semester & XGBoost & 0.671 $\pm$ 0.010 & 0.907 $\pm$ 0.009 & 0.637 $\pm$ 0.011 & 0.885 $\pm$ 0.011 \\
+ & Logistic Regression & 0.667 $\pm$ 0.013 & 0.906 $\pm$ 0.009 & 0.637 $\pm$ 0.011 & 0.884 $\pm$ 0.010 \\
+2nd semester & XGBoost & 0.712 $\pm$ 0.013 & 0.926 $\pm$ 0.007 & 0.685 $\pm$ 0.013 & 0.909 $\pm$ 0.008 \\
+ & Logistic Regression & 0.703 $\pm$ 0.015 & 0.923 $\pm$ 0.009 & 0.681 $\pm$ 0.015 & 0.908 $\pm$ 0.009 \\
+\bottomrule
+\end{tabular}
+\end{table}

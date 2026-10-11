@@ -282,19 +282,21 @@ def shap_analysis(df):
     ax.legend(loc="lower right")
     save(fig, "fig_shap_global")
 
-    plt.figure()
-    exp = shap.Explanation(values=vals[:, :, 0], data=Xte, feature_names=feats)
-    shap.plots.beeswarm(exp, max_display=12, show=False, plot_size=(5.2, 3.6),
-                        color_bar_label="Feature value")
-    f = plt.gcf()
-    f.axes[0].set_xlabel("SHAP value for the Dropout class (log-odds)", fontsize=9)
-    for ax_ in f.axes:
-        ax_.tick_params(labelsize=8)
-        ax_.yaxis.label.set_size(9)
-    for t in f.axes[0].get_yticklabels():
-        t.set_fontsize(8)
-    f.savefig(FIG / "fig_shap_dropout.pdf", bbox_inches="tight")
-    plt.close(f)
+    for ci, cname in [(0, "dropout"), (1, "enrolled")]:
+        plt.figure()
+        exp = shap.Explanation(values=vals[:, :, ci], data=Xte, feature_names=feats)
+        shap.plots.beeswarm(exp, max_display=12, show=False, plot_size=(5.2, 3.6),
+                            color_bar_label="Feature value")
+        f = plt.gcf()
+        f.axes[0].set_xlabel(f"SHAP value for the {CLASS_NAMES[ci]} class (log-odds)",
+                             fontsize=9)
+        for ax_ in f.axes:
+            ax_.tick_params(labelsize=8)
+            ax_.yaxis.label.set_size(9)
+        for t in f.axes[0].get_yticklabels():
+            t.set_fontsize(8)
+        f.savefig(FIG / f"fig_shap_{cname}.pdf", bbox_inches="tight")
+        plt.close(f)
 
     # direction check for text: correlation between feature value and SHAP (dropout)
     direction = {feats[j]: float(np.corrcoef(Xte[:, j], vals[:, j, 0])[0, 1])

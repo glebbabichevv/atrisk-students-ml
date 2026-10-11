@@ -1,0 +1,22 @@
+\begin{table}[t]
+\centering
+\small
+\setlength{\tabcolsep}{3.5pt}
+\caption{Three-class setting with information available at enrolment (24 features).}
+\label{tab:enrol}
+\begin{tabular}{lcccccc}
+\toprule
+Model & Accuracy & Macro F1 & AUC & F1 Dropout & F1 Enrolled & F1 Graduate \\
+\midrule
+Logistic Regression & 0.649 $\pm$ 0.012 & 0.542 $\pm$ 0.012$^{\dagger}$ & 0.778 $\pm$ 0.011 & 0.638 & 0.243 & 0.746 \\
+Decision Tree & 0.597 $\pm$ 0.018 & 0.499 $\pm$ 0.019 & 0.707 $\pm$ 0.016 & 0.582 & 0.209 & 0.706 \\
+Random Forest & 0.642 $\pm$ 0.009 & 0.504 $\pm$ 0.013 & 0.774 $\pm$ 0.010 & 0.635 & 0.139 & 0.738 \\
+SVM (RBF) & 0.634 $\pm$ 0.013 & 0.512 $\pm$ 0.015 & 0.754 $\pm$ 0.010 & 0.609 & 0.191 & 0.737 \\
+Gradient Boosting & 0.650 $\pm$ 0.009 & \textbf{0.551 $\pm$ 0.013} & 0.780 $\pm$ 0.012 & 0.636 & 0.272 & 0.746 \\
+XGBoost & \textbf{0.653 $\pm$ 0.010} & 0.550 $\pm$ 0.013$^{\dagger}$ & \textbf{0.786 $\pm$ 0.010} & \textbf{0.639} & 0.261 & \textbf{0.751} \\
+LightGBM & 0.643 $\pm$ 0.010 & 0.547 $\pm$ 0.011$^{\dagger}$ & 0.774 $\pm$ 0.009 & 0.626 & \textbf{0.273} & 0.744 \\
+MLP & 0.642 $\pm$ 0.014 & 0.516 $\pm$ 0.040$^{\dagger}$ & 0.769 $\pm$ 0.015 & 0.633 & 0.176 & 0.740 \\
+\bottomrule
+\end{tabular}
+\par\smallskip\footnotesize Mean $\pm$ SD over 25 test folds (5-fold CV repeated 5 times); class-wise F1 columns show the mean only. Bold: best value. $^{\dagger}$: not significantly different from the best model on that metric (corrected resampled $t$-test, $p\ge 0.05$).
+\end{table}
