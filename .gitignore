@@ -1,5 +1,4 @@
-# Dataset — download separately (CC BY 4.0, cite Realinho et al. 2022)
-data/*.csv
+# Dataset is included (CC BY 4.0), see data/README.md
 data/*.zip
 
 # Python

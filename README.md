@@ -1,5 +1,7 @@
 # Predicting Dropout and Delayed Completion in Higher Education
 
+[![License: MIT](https://img.shields.io/badge/code-MIT-blue.svg)](LICENSE) [![Data: CC BY 4.0](https://img.shields.io/badge/data-CC%20BY%204.0-green.svg)](data/README.md)
+
 Code and paper for *Predicting Dropout and Delayed Completion in Higher Education: Outcome Definition, Prediction Time and Evaluation on a Public Benchmark* (Gleb Babichev, 2026).
 
 Every number, table and figure in `paper/` is produced by the scripts in `src/`. Nothing in the paper is typed by hand.
@@ -8,7 +10,7 @@ Every number, table and figure in `paper/` is produced by the scripts in `src/`.
 
 UCI *Predict Students' Dropout and Academic Success* (Realinho et al., 2022), DOI [10.24432/C5MC89](https://doi.org/10.24432/C5MC89), CC BY 4.0. 4,424 students, 36 features, three outcomes recorded at the end of the normal course duration: Dropout, Enrolled (still enrolled, i.e. delayed) and Graduate.
 
-Download the CSV from the UCI page and save it as `data/dataset.csv`. The semicolon-separated UCI file and the comma-separated Kaggle copy both work.
+A copy is included in `data/dataset.csv` (CC BY 4.0, see `data/README.md`).
 
 ## Reproduce
 
@@ -38,6 +40,10 @@ cd paper && latexmk -pdf main.tex
 | Three-class, enrolment only | 0.551 | Dropout AUC 0.817 |
 
 After one semester, a list of the 20% highest-risk students reaches 57% of eventual dropouts with 92% precision. Group-specific thresholds raise dropout recall for scholarship holders from 0.37 to 0.57 at almost no cost in precision. Nested tuning does not change any result significantly.
+
+## Citation
+
+See `CITATION.cff` (GitHub shows a "Cite this repository" button).
 
 ## Licence
 

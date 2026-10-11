@@ -1,0 +1,32 @@
+cff-version: 1.2.0
+message: "If you use this code, please cite the paper below."
+title: "Predicting Dropout and Delayed Completion in Higher Education: Outcome Definition, Prediction Time and Evaluation on a Public Benchmark"
+authors:
+  - family-names: Babichev
+    given-names: Gleb
+    affiliation: University College London
+    email: gleb.babichev007@gmail.com
+date-released: 2026-10-11
+repository-code: "https://github.com/glebbabichevv/atrisk-students-ml"
+license: MIT
+keywords:
+  - student dropout
+  - early warning systems
+  - educational data mining
+  - calibration
+  - algorithmic fairness
+references:
+  - type: dataset
+    title: "Predict Students' Dropout and Academic Success"
+    authors:
+      - family-names: Realinho
+        given-names: Valentim
+      - family-names: Vieira Martins
+        given-names: Mónica
+      - family-names: Machado
+        given-names: Jorge
+      - family-names: Baptista
+        given-names: Luís
+    doi: 10.24432/C5MC89
+    year: 2021
+    license: CC-BY-4.0
