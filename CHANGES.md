@@ -47,3 +47,9 @@
 - Sensitivity analysis without the fee-status variables, whose recording time is undocumented (87% of students behind on fees drop out, so possible leakage).
 - Nested hyperparameter tuning for LR, RF, XGBoost and LightGBM: no significant change.
 - Appendix: full tables at enrolment and after the first semester, SHAP for the Enrolled class, hyperparameter table.
+
+## Added in the third round
+
+- Leave-one-programme-out validation (17 programmes): within-programme ranking transfers, probabilities need recalibration; logistic regression transfers better than XGBoost.
+- Found a recording artefact: in Animation and Multimedia Design, 84% of students have no curricular units recorded in either semester (78% of its graduates).
+- Bibliography: Villar (2024) first author is Alice Villar.

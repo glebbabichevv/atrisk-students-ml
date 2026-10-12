@@ -16,7 +16,7 @@ A copy is included in `data/dataset.csv` (CC BY 4.0, see `data/README.md`).
 
 ```bash
 pip install -r requirements.txt
-python run_all.py                 # ~50 min on 2 cores
+python run_all.py                 # ~70 min on 2 cores
 cd paper && latexmk -pdf main.tex
 ```
 
@@ -27,6 +27,7 @@ cd paper && latexmk -pdf main.tex
 | `src/analysis.py` | calibration, subgroup errors with bootstrap CIs, feature selection inside CV, SHAP, all figures |
 | `src/sensitivity.py` | repeats the three-class analysis without the two fee-status variables |
 | `src/decision.py` | fixed-size alert lists (precision and reach) and group-specific thresholds (cross-fitted) |
+| `src/transfer.py` | leave-one-programme-out validation (17 programmes) |
 | `src/tuning.py` | nested CV with randomised search for four models |
 | `src/make_tables.py` | writes `paper/generated/` (tables and `\newcommand` number macros) |
 

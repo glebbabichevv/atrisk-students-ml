@@ -1,0 +1,946 @@
+{
+ "sem1": {
+  "XGBoost": {
+   "pooled": {
+    "within": {
+     "f1": 0.667893946923661,
+     "auc_dropout": 0.9005050778449792,
+     "ece_dropout": 0.020631818983871845
+    },
+    "lopo": {
+     "f1": 0.6395778602492906,
+     "auc_dropout": 0.8750293806592188,
+     "ece_dropout": 0.050092605752106265
+    },
+    "auc_diff_ci": [
+     -0.05203599299022504,
+     -0.007635288643168929
+    ],
+    "within_excl171": {
+     "auc_dropout": 0.9054153991875991,
+     "f1": 0.6778302236417565
+    },
+    "lopo_excl171": {
+     "auc_dropout": 0.8918905626696296,
+     "f1": 0.6530009842845154
+    },
+    "auc_diff_ci_excl171": [
+     -0.020503362332752954,
+     -0.005911398637230389
+    ]
+   },
+   "per_programme": [
+    {
+     "code": 33,
+     "name": "Biofuel Production Technologies",
+     "n": 12,
+     "dropout_rate": 0.6666666666666666,
+     "within_f1": 0.425,
+     "lopo_f1": 0.425,
+     "within_auc": 0.90625,
+     "lopo_auc": 0.90625,
+     "lopo_mean_p": 0.565513824733595
+    },
+    {
+     "code": 171,
+     "name": "Animation and Multimedia Design",
+     "n": 215,
+     "dropout_rate": 0.3813953488372093,
+     "within_f1": 0.4634806819185309,
+     "lopo_f1": 0.3057920613982492,
+     "within_auc": 0.7494956904456264,
+     "lopo_auc": 0.6830185219145425,
+     "lopo_mean_p": 0.8583198396532341
+    },
+    {
+     "code": 8014,
+     "name": "Social Service (evening)",
+     "n": 215,
+     "dropout_rate": 0.3302325581395349,
+     "within_f1": 0.6283589689132856,
+     "lopo_f1": 0.6401187226482951,
+     "within_auc": 0.9527582159624413,
+     "lopo_auc": 0.9584311424100157,
+     "lopo_mean_p": 0.41952887352469354
+    },
+    {
+     "code": 9003,
+     "name": "Agronomy",
+     "n": 210,
+     "dropout_rate": 0.4095238095238095,
+     "within_f1": 0.7142531876138434,
+     "lopo_f1": 0.6722390382214797,
+     "within_auc": 0.9439234808702175,
+     "lopo_auc": 0.943173293323331,
+     "lopo_mean_p": 0.49619598662303316
+    },
+    {
+     "code": 9070,
+     "name": "Communication Design",
+     "n": 226,
+     "dropout_rate": 0.22566371681415928,
+     "within_f1": 0.5768434854707777,
+     "lopo_f1": 0.5388118472864235,
+     "within_auc": 0.8592717086834732,
+     "lopo_auc": 0.861624649859944,
+     "lopo_mean_p": 0.27283717148146075
+    },
+    {
+     "code": 9085,
+     "name": "Veterinary Nursing",
+     "n": 337,
+     "dropout_rate": 0.26706231454005935,
+     "within_f1": 0.6855200947764798,
+     "lopo_f1": 0.6820458780279539,
+     "within_auc": 0.9054430949167792,
+     "lopo_auc": 0.8932073774179037,
+     "lopo_mean_p": 0.30723001499237484
+    },
+    {
+     "code": 9119,
+     "name": "Informatics Engineering",
+     "n": 170,
+     "dropout_rate": 0.5411764705882353,
+     "within_f1": 0.5986520482318801,
+     "lopo_f1": 0.5073378538222779,
+     "within_auc": 0.8106187290969898,
+     "lopo_auc": 0.806995540691193,
+     "lopo_mean_p": 0.5270270143580787
+    },
+    {
+     "code": 9130,
+     "name": "Equinculture",
+     "n": 141,
+     "dropout_rate": 0.5531914893617021,
+     "within_f1": 0.5809797437704414,
+     "lopo_f1": 0.6214915535602209,
+     "within_auc": 0.8752543752543752,
+     "lopo_auc": 0.868945868945869,
+     "lopo_mean_p": 0.4528108884758772
+    },
+    {
+     "code": 9147,
+     "name": "Management",
+     "n": 380,
+     "dropout_rate": 0.3526315789473684,
+     "within_f1": 0.6644351795358507,
+     "lopo_f1": 0.6491489361702127,
+     "within_auc": 0.8942179347166606,
+     "lopo_auc": 0.9031064191238927,
+     "lopo_mean_p": 0.3908297214693831
+    },
+    {
+     "code": 9238,
+     "name": "Social Service",
+     "n": 355,
+     "dropout_rate": 0.18309859154929578,
+     "within_f1": 0.6271119278778267,
+     "lopo_f1": 0.6040375667019742,
+     "within_auc": 0.896657824933687,
+     "lopo_auc": 0.8891777188328912,
+     "lopo_mean_p": 0.2711014063123771
+    },
+    {
+     "code": 9254,
+     "name": "Tourism",
+     "n": 252,
+     "dropout_rate": 0.38095238095238093,
+     "within_f1": 0.681978422094701,
+     "lopo_f1": 0.6670807232495178,
+     "within_auc": 0.9195379273504273,
+     "lopo_auc": 0.9192040598290597,
+     "lopo_mean_p": 0.3263094218093015
+    },
+    {
+     "code": 9500,
+     "name": "Nursing",
+     "n": 766,
+     "dropout_rate": 0.15404699738903394,
+     "within_f1": 0.7172337177629392,
+     "lopo_f1": 0.6780350495362889,
+     "within_auc": 0.8951663527934715,
+     "lopo_auc": 0.8787141661435447,
+     "lopo_mean_p": 0.18798170262502686
+    },
+    {
+     "code": 9556,
+     "name": "Oral Hygiene",
+     "n": 86,
+     "dropout_rate": 0.38372093023255816,
+     "within_f1": 0.6628261266192301,
+     "lopo_f1": 0.6464881444720154,
+     "within_auc": 0.9222412807318467,
+     "lopo_auc": 0.9365351629502574,
+     "lopo_mean_p": 0.35058409331886226
+    },
+    {
+     "code": 9670,
+     "name": "Advertising and Marketing",
+     "n": 268,
+     "dropout_rate": 0.35447761194029853,
+     "within_f1": 0.6677084087428294,
+     "lopo_f1": 0.6392189966124601,
+     "within_auc": 0.9086096744752054,
+     "lopo_auc": 0.9017341040462427,
+     "lopo_mean_p": 0.3355179771176303
+    },
+    {
+     "code": 9773,
+     "name": "Journalism and Communication",
+     "n": 331,
+     "dropout_rate": 0.30513595166163143,
+     "within_f1": 0.6199692780337941,
+     "lopo_f1": 0.6430170880838152,
+     "within_auc": 0.8658631080499355,
+     "lopo_auc": 0.8684029272492467,
+     "lopo_mean_p": 0.27850821499045925
+    },
+    {
+     "code": 9853,
+     "name": "Basic Education",
+     "n": 192,
+     "dropout_rate": 0.4427083333333333,
+     "within_f1": 0.5563344125217036,
+     "lopo_f1": 0.5203388742441932,
+     "within_auc": 0.8170423309510719,
+     "lopo_auc": 0.8125343595382079,
+     "lopo_mean_p": 0.29034048241373966
+    },
+    {
+     "code": 9991,
+     "name": "Management (evening)",
+     "n": 268,
+     "dropout_rate": 0.5074626865671642,
+     "within_f1": 0.6630891182239163,
+     "lopo_f1": 0.6218883818883819,
+     "within_auc": 0.9161096256684492,
+     "lopo_auc": 0.9058600713012478,
+     "lopo_mean_p": 0.45660542848228075
+    }
+   ],
+   "summary": {
+    "n_programmes_reported": 16,
+    "zero_units_share_171": 0.8372093023255814,
+    "zero_units_share_other": 0.0,
+    "zero_units_graduates_171": 0.78125,
+    "median_auc_drop": -0.004065579909330486,
+    "worst_auc_drop": -0.06647716853108387,
+    "n_drop_gt_005": 1,
+    "lopo_auc_min": 0.6830185219145425,
+    "lopo_auc_max": 0.9584311424100157,
+    "worst_programme": "Animation and Multimedia Design",
+    "lowest_auc_programme": "Animation and Multimedia Design",
+    "calib_gap_mean_abs": 0.0844682584132617,
+    "calib_gap_max_abs": 0.4769244908160248,
+    "calib_gap_max_programme": "Animation and Multimedia Design"
+   }
+  },
+  "Logistic Regression": {
+   "pooled": {
+    "within": {
+     "f1": 0.6506259041340201,
+     "auc_dropout": 0.8977836613304594,
+     "ece_dropout": 0.017877348597835494
+    },
+    "lopo": {
+     "f1": 0.6347536834165416,
+     "auc_dropout": 0.890659657021374,
+     "ece_dropout": 0.030148637090558195
+    },
+    "auc_diff_ci": [
+     -0.013873515795710264,
+     -0.0011720980909255805
+    ],
+    "within_excl171": {
+     "auc_dropout": 0.9017083319238186,
+     "f1": 0.6590443315100822
+    },
+    "lopo_excl171": {
+     "auc_dropout": 0.896766269487084,
+     "f1": 0.6452878322976697
+    },
+    "auc_diff_ci_excl171": [
+     -0.009222232440643768,
+     -3.850330456165672e-06
+    ]
+   },
+   "per_programme": [
+    {
+     "code": 33,
+     "name": "Biofuel Production Technologies",
+     "n": 12,
+     "dropout_rate": 0.6666666666666666,
+     "within_f1": 0.37777777777777777,
+     "lopo_f1": 0.37777777777777777,
+     "within_auc": 0.90625,
+     "lopo_auc": 0.90625,
+     "lopo_mean_p": 0.5813314293896447
+    },
+    {
+     "code": 171,
+     "name": "Animation and Multimedia Design",
+     "n": 215,
+     "dropout_rate": 0.3813953488372093,
+     "within_f1": 0.47445079547842933,
+     "lopo_f1": 0.39357590297214445,
+     "within_auc": 0.7667339079405832,
+     "lopo_auc": 0.7358334861544105,
+     "lopo_mean_p": 0.615752360458011
+    },
+    {
+     "code": 8014,
+     "name": "Social Service (evening)",
+     "n": 215,
+     "dropout_rate": 0.3302325581395349,
+     "within_f1": 0.6331620643861336,
+     "lopo_f1": 0.6278786842438072,
+     "within_auc": 0.9514866979655712,
+     "lopo_auc": 0.9472809076682316,
+     "lopo_mean_p": 0.42612266698704215
+    },
+    {
+     "code": 9003,
+     "name": "Agronomy",
+     "n": 210,
+     "dropout_rate": 0.4095238095238095,
+     "within_f1": 0.6775616683646692,
+     "lopo_f1": 0.6569334000432905,
+     "within_auc": 0.9471117779444861,
+     "lopo_auc": 0.947111777944486,
+     "lopo_mean_p": 0.4518593379872023
+    },
+    {
+     "code": 9070,
+     "name": "Communication Design",
+     "n": 226,
+     "dropout_rate": 0.22566371681415928,
+     "within_f1": 0.5950326797385621,
+     "lopo_f1": 0.6037647165163943,
+     "within_auc": 0.8900840336134453,
+     "lopo_auc": 0.8901960784313726,
+     "lopo_mean_p": 0.2371721775797217
+    },
+    {
+     "code": 9085,
+     "name": "Veterinary Nursing",
+     "n": 337,
+     "dropout_rate": 0.26706231454005935,
+     "within_f1": 0.6922164041550082,
+     "lopo_f1": 0.6753687642441125,
+     "within_auc": 0.8636527215474584,
+     "lopo_auc": 0.8707602339181285,
+     "lopo_mean_p": 0.3046694705926431
+    },
+    {
+     "code": 9119,
+     "name": "Informatics Engineering",
+     "n": 170,
+     "dropout_rate": 0.5411764705882353,
+     "within_f1": 0.568671228454774,
+     "lopo_f1": 0.5196074542495054,
+     "within_auc": 0.830546265328874,
+     "lopo_auc": 0.8351449275362319,
+     "lopo_mean_p": 0.5846244616993141
+    },
+    {
+     "code": 9130,
+     "name": "Equinculture",
+     "n": 141,
+     "dropout_rate": 0.5531914893617021,
+     "within_f1": 0.5929237988588493,
+     "lopo_f1": 0.5906507530548452,
+     "within_auc": 0.8652828652828652,
+     "lopo_auc": 0.8667073667073667,
+     "lopo_mean_p": 0.4317973408729254
+    },
+    {
+     "code": 9147,
+     "name": "Management",
+     "n": 380,
+     "dropout_rate": 0.3526315789473684,
+     "within_f1": 0.6351851851851852,
+     "lopo_f1": 0.6561954593779123,
+     "within_auc": 0.886664239776726,
+     "lopo_auc": 0.8921854143914573,
+     "lopo_mean_p": 0.3919099451142145
+    },
+    {
+     "code": 9238,
+     "name": "Social Service",
+     "n": 355,
+     "dropout_rate": 0.18309859154929578,
+     "within_f1": 0.6456498328404269,
+     "lopo_f1": 0.6414289216054107,
+     "within_auc": 0.9011140583554377,
+     "lopo_auc": 0.8945888594164456,
+     "lopo_mean_p": 0.23664413155644562
+    },
+    {
+     "code": 9254,
+     "name": "Tourism",
+     "n": 252,
+     "dropout_rate": 0.38095238095238093,
+     "within_f1": 0.6440310546481145,
+     "lopo_f1": 0.6365861568268076,
+     "within_auc": 0.9170005341880342,
+     "lopo_auc": 0.9202056623931624,
+     "lopo_mean_p": 0.31490097343403145
+    },
+    {
+     "code": 9500,
+     "name": "Nursing",
+     "n": 766,
+     "dropout_rate": 0.15404699738903394,
+     "within_f1": 0.6535570246786696,
+     "lopo_f1": 0.6376714238173216,
+     "within_auc": 0.9011822557020297,
+     "lopo_auc": 0.8935708307177234,
+     "lopo_mean_p": 0.18347124704710785
+    },
+    {
+     "code": 9556,
+     "name": "Oral Hygiene",
+     "n": 86,
+     "dropout_rate": 0.38372093023255816,
+     "within_f1": 0.7095238095238096,
+     "lopo_f1": 0.6757443718228032,
+     "within_auc": 0.949685534591195,
+     "lopo_auc": 0.9451114922813035,
+     "lopo_mean_p": 0.3286459177682008
+    },
+    {
+     "code": 9670,
+     "name": "Advertising and Marketing",
+     "n": 268,
+     "dropout_rate": 0.35447761194029853,
+     "within_f1": 0.6969262852479826,
+     "lopo_f1": 0.6751491124683024,
+     "within_auc": 0.9049589291146942,
+     "lopo_auc": 0.904228780042592,
+     "lopo_mean_p": 0.34864502340075126
+    },
+    {
+     "code": 9773,
+     "name": "Journalism and Communication",
+     "n": 331,
+     "dropout_rate": 0.30513595166163143,
+     "within_f1": 0.6008790546804818,
+     "lopo_f1": 0.6088935741791285,
+     "within_auc": 0.8562634524321997,
+     "lopo_auc": 0.8578992681876884,
+     "lopo_mean_p": 0.26359342824579934
+    },
+    {
+     "code": 9853,
+     "name": "Basic Education",
+     "n": 192,
+     "dropout_rate": 0.4427083333333333,
+     "within_f1": 0.528276807125728,
+     "lopo_f1": 0.4699297691191872,
+     "within_auc": 0.8162726772952171,
+     "lopo_auc": 0.8107751511819682,
+     "lopo_mean_p": 0.2918976580745294
+    },
+    {
+     "code": 9991,
+     "name": "Management (evening)",
+     "n": 268,
+     "dropout_rate": 0.5074626865671642,
+     "within_f1": 0.6277860133059782,
+     "lopo_f1": 0.5983731549853725,
+     "within_auc": 0.9111519607843137,
+     "lopo_auc": 0.9177807486631017,
+     "lopo_mean_p": 0.41115423305086113
+    }
+   ],
+   "summary": {
+    "n_programmes_reported": 16,
+    "zero_units_share_171": 0.8372093023255814,
+    "zero_units_share_other": 0.0,
+    "zero_units_graduates_171": 0.78125,
+    "median_auc_drop": 5.602240896357413e-05,
+    "worst_auc_drop": -0.030900421786172694,
+    "n_drop_gt_005": 0,
+    "lopo_auc_min": 0.7358334861544105,
+    "lopo_auc_max": 0.9472809076682316,
+    "worst_programme": "Animation and Multimedia Design",
+    "lowest_auc_programme": "Animation and Multimedia Design",
+    "calib_gap_mean_abs": 0.07027557636843541,
+    "calib_gap_max_abs": 0.23435701162080164,
+    "calib_gap_max_programme": "Animation and Multimedia Design"
+   }
+  }
+ },
+ "multiclass": {
+  "XGBoost": {
+   "pooled": {
+    "within": {
+     "f1": 0.7108805761018878,
+     "auc_dropout": 0.9224836856786188,
+     "ece_dropout": 0.012197246320790295
+    },
+    "lopo": {
+     "f1": 0.6765088854459308,
+     "auc_dropout": 0.8982401600276337,
+     "ece_dropout": 0.039809699411490075
+    },
+    "auc_diff_ci": [
+     -0.05755509548446701,
+     -0.006495578088015017
+    ],
+    "within_excl171": {
+     "auc_dropout": 0.9276550704800764,
+     "f1": 0.7205950594498276
+    },
+    "lopo_excl171": {
+     "auc_dropout": 0.9175998521961108,
+     "f1": 0.6909956427823216
+    },
+    "auc_diff_ci_excl171": [
+     -0.014535505203358487,
+     -0.005190467364873212
+    ]
+   },
+   "per_programme": [
+    {
+     "code": 33,
+     "name": "Biofuel Production Technologies",
+     "n": 12,
+     "dropout_rate": 0.6666666666666666,
+     "within_f1": 0.625,
+     "lopo_f1": 0.4803921568627451,
+     "within_auc": 0.90625,
+     "lopo_auc": 0.90625,
+     "lopo_mean_p": 0.6259719965358576
+    },
+    {
+     "code": 171,
+     "name": "Animation and Multimedia Design",
+     "n": 215,
+     "dropout_rate": 0.3813953488372093,
+     "within_f1": 0.5155435860668618,
+     "lopo_f1": 0.32652221848634366,
+     "within_auc": 0.7452778287181369,
+     "lopo_auc": 0.6592701265358519,
+     "lopo_mean_p": 0.8536667950624643
+    },
+    {
+     "code": 8014,
+     "name": "Social Service (evening)",
+     "n": 215,
+     "dropout_rate": 0.3302325581395349,
+     "within_f1": 0.6509047372860602,
+     "lopo_f1": 0.6631767521769137,
+     "within_auc": 0.9518779342723004,
+     "lopo_auc": 0.954518779342723,
+     "lopo_mean_p": 0.3944781742903382
+    },
+    {
+     "code": 9003,
+     "name": "Agronomy",
+     "n": 210,
+     "dropout_rate": 0.4095238095238095,
+     "within_f1": 0.7435962251432423,
+     "lopo_f1": 0.7251209814190299,
+     "within_auc": 0.9497374343585896,
+     "lopo_auc": 0.9578957239309827,
+     "lopo_mean_p": 0.451214998136718
+    },
+    {
+     "code": 9070,
+     "name": "Communication Design",
+     "n": 226,
+     "dropout_rate": 0.22566371681415928,
+     "within_f1": 0.5919321074576956,
+     "lopo_f1": 0.5975872850147249,
+     "within_auc": 0.8987114845938374,
+     "lopo_auc": 0.9045378151260505,
+     "lopo_mean_p": 0.2651503465078623
+    },
+    {
+     "code": 9085,
+     "name": "Veterinary Nursing",
+     "n": 337,
+     "dropout_rate": 0.26706231454005935,
+     "within_f1": 0.7736666378648572,
+     "lopo_f1": 0.7382775865244309,
+     "within_auc": 0.9344579397210977,
+     "lopo_auc": 0.9229419703103914,
+     "lopo_mean_p": 0.31716407153158493
+    },
+    {
+     "code": 9119,
+     "name": "Informatics Engineering",
+     "n": 170,
+     "dropout_rate": 0.5411764705882353,
+     "within_f1": 0.6069875843907407,
+     "lopo_f1": 0.602999777999778,
+     "within_auc": 0.8214882943143812,
+     "lopo_auc": 0.8284559643255295,
+     "lopo_mean_p": 0.5539853490450803
+    },
+    {
+     "code": 9130,
+     "name": "Equinculture",
+     "n": 141,
+     "dropout_rate": 0.5531914893617021,
+     "within_f1": 0.6934523809523809,
+     "lopo_f1": 0.6771952043228638,
+     "within_auc": 0.9165649165649166,
+     "lopo_auc": 0.9129019129019129,
+     "lopo_mean_p": 0.4512240275185793
+    },
+    {
+     "code": 9147,
+     "name": "Management",
+     "n": 380,
+     "dropout_rate": 0.3526315789473684,
+     "within_f1": 0.7139392839864538,
+     "lopo_f1": 0.6963369963369962,
+     "within_auc": 0.9192755733527485,
+     "lopo_auc": 0.9128443150103143,
+     "lopo_mean_p": 0.3866667021102713
+    },
+    {
+     "code": 9238,
+     "name": "Social Service",
+     "n": 355,
+     "dropout_rate": 0.18309859154929578,
+     "within_f1": 0.715576544317198,
+     "lopo_f1": 0.6829512051734273,
+     "within_auc": 0.9439787798408488,
+     "lopo_auc": 0.9352785145888594,
+     "lopo_mean_p": 0.2502388748838763
+    },
+    {
+     "code": 9254,
+     "name": "Tourism",
+     "n": 252,
+     "dropout_rate": 0.38095238095238093,
+     "within_f1": 0.721075028166012,
+     "lopo_f1": 0.7444406685756588,
+     "within_auc": 0.93235844017094,
+     "lopo_auc": 0.9296875,
+     "lopo_mean_p": 0.34795423405751263
+    },
+    {
+     "code": 9500,
+     "name": "Nursing",
+     "n": 766,
+     "dropout_rate": 0.15404699738903394,
+     "within_f1": 0.7442127040158213,
+     "lopo_f1": 0.7071699191833508,
+     "within_auc": 0.9130832810211342,
+     "lopo_auc": 0.9008814605566018,
+     "lopo_mean_p": 0.16724161454537206
+    },
+    {
+     "code": 9556,
+     "name": "Oral Hygiene",
+     "n": 86,
+     "dropout_rate": 0.38372093023255816,
+     "within_f1": 0.7116071428571429,
+     "lopo_f1": 0.6902858193180773,
+     "within_auc": 0.9439679817038308,
+     "lopo_auc": 0.9525443110348771,
+     "lopo_mean_p": 0.3661475702253885
+    },
+    {
+     "code": 9670,
+     "name": "Advertising and Marketing",
+     "n": 268,
+     "dropout_rate": 0.35447761194029853,
+     "within_f1": 0.6731360755158716,
+     "lopo_f1": 0.6318332760792397,
+     "within_auc": 0.9257681776696076,
+     "lopo_auc": 0.9075752966230605,
+     "lopo_mean_p": 0.32571323906113187
+    },
+    {
+     "code": 9773,
+     "name": "Journalism and Communication",
+     "n": 331,
+     "dropout_rate": 0.30513595166163143,
+     "within_f1": 0.6428342421586346,
+     "lopo_f1": 0.6334283000949668,
+     "within_auc": 0.8919500645716746,
+     "lopo_auc": 0.8845458458889368,
+     "lopo_mean_p": 0.27818033747372195
+    },
+    {
+     "code": 9853,
+     "name": "Basic Education",
+     "n": 192,
+     "dropout_rate": 0.4427083333333333,
+     "within_f1": 0.5994234437315762,
+     "lopo_f1": 0.5742013274543395,
+     "within_auc": 0.8891698735568994,
+     "lopo_auc": 0.8760857614073666,
+     "lopo_mean_p": 0.31477248335068
+    },
+    {
+     "code": 9991,
+     "name": "Management (evening)",
+     "n": 268,
+     "dropout_rate": 0.5074626865671642,
+     "within_f1": 0.7480530529501034,
+     "lopo_f1": 0.5773227718009272,
+     "within_auc": 0.9300356506238858,
+     "lopo_auc": 0.9304255793226381,
+     "lopo_mean_p": 0.4526415384590014
+    }
+   ],
+   "summary": {
+    "n_programmes_reported": 16,
+    "zero_units_share_171": 0.8372093023255814,
+    "zero_units_share_other": 0.0,
+    "zero_units_graduates_171": 0.78125,
+    "median_auc_drop": -0.005047131002718919,
+    "worst_auc_drop": -0.08600770218228493,
+    "n_drop_gt_005": 1,
+    "lopo_auc_min": 0.6592701265358519,
+    "lopo_auc_max": 0.9578957239309827,
+    "worst_programme": "Animation and Multimedia Design",
+    "lowest_auc_programme": "Animation and Multimedia Design",
+    "calib_gap_mean_abs": 0.07412446835549469,
+    "calib_gap_max_abs": 0.472271446225255,
+    "calib_gap_max_programme": "Animation and Multimedia Design"
+   }
+  },
+  "Logistic Regression": {
+   "pooled": {
+    "within": {
+     "f1": 0.6902095178628865,
+     "auc_dropout": 0.9182016669701399,
+     "ece_dropout": 0.018925411979706853
+    },
+    "lopo": {
+     "f1": 0.6744321187200111,
+     "auc_dropout": 0.91163516286669,
+     "ece_dropout": 0.027947209223413923
+    },
+    "auc_diff_ci": [
+     -0.011651645288162978,
+     -0.0024934156146004223
+    ],
+    "within_excl171": {
+     "auc_dropout": 0.9226780087068982,
+     "f1": 0.7007367282691105
+    },
+    "lopo_excl171": {
+     "auc_dropout": 0.9175746110389729,
+     "f1": 0.6870030719614846
+    },
+    "auc_diff_ci_excl171": [
+     -0.008223756334900672,
+     -0.0016244008758821153
+    ]
+   },
+   "per_programme": [
+    {
+     "code": 33,
+     "name": "Biofuel Production Technologies",
+     "n": 12,
+     "dropout_rate": 0.6666666666666666,
+     "within_f1": 0.4803921568627451,
+     "lopo_f1": 0.4803921568627451,
+     "within_auc": 0.90625,
+     "lopo_auc": 0.90625,
+     "lopo_mean_p": 0.688872221450902
+    },
+    {
+     "code": 171,
+     "name": "Animation and Multimedia Design",
+     "n": 215,
+     "dropout_rate": 0.3813953488372093,
+     "within_f1": 0.46575027707944744,
+     "lopo_f1": 0.3940280657867308,
+     "within_auc": 0.748395378690629,
+     "lopo_auc": 0.7287731523931782,
+     "lopo_mean_p": 0.602636079050567
+    },
+    {
+     "code": 8014,
+     "name": "Social Service (evening)",
+     "n": 215,
+     "dropout_rate": 0.3302325581395349,
+     "within_f1": 0.7068996415770609,
+     "lopo_f1": 0.6855534525518863,
+     "within_auc": 0.9584311424100157,
+     "lopo_auc": 0.9598004694835681,
+     "lopo_mean_p": 0.4332623264643321
+    },
+    {
+     "code": 9003,
+     "name": "Agronomy",
+     "n": 210,
+     "dropout_rate": 0.4095238095238095,
+     "within_f1": 0.695480185744862,
+     "lopo_f1": 0.6832769358090728,
+     "within_auc": 0.9512378094523631,
+     "lopo_auc": 0.9516129032258064,
+     "lopo_mean_p": 0.4187598578939259
+    },
+    {
+     "code": 9070,
+     "name": "Communication Design",
+     "n": 226,
+     "dropout_rate": 0.22566371681415928,
+     "within_f1": 0.6642655761068254,
+     "lopo_f1": 0.6297965280329282,
+     "within_auc": 0.9193277310924369,
+     "lopo_auc": 0.919327731092437,
+     "lopo_mean_p": 0.2595969788094755
+    },
+    {
+     "code": 9085,
+     "name": "Veterinary Nursing",
+     "n": 337,
+     "dropout_rate": 0.26706231454005935,
+     "within_f1": 0.7407932607932608,
+     "lopo_f1": 0.739234030624759,
+     "within_auc": 0.8970760233918129,
+     "lopo_auc": 0.9012595591542959,
+     "lopo_mean_p": 0.30632500686756853
+    },
+    {
+     "code": 9119,
+     "name": "Informatics Engineering",
+     "n": 170,
+     "dropout_rate": 0.5411764705882353,
+     "within_f1": 0.604597562707386,
+     "lopo_f1": 0.5753410172359099,
+     "within_auc": 0.8436454849498327,
+     "lopo_auc": 0.847129319955407,
+     "lopo_mean_p": 0.5738547955125402
+    },
+    {
+     "code": 9130,
+     "name": "Equinculture",
+     "n": 141,
+     "dropout_rate": 0.5531914893617021,
+     "within_f1": 0.6670509011809224,
+     "lopo_f1": 0.6614451639428512,
+     "within_auc": 0.9124949124949124,
+     "lopo_auc": 0.9114774114774116,
+     "lopo_mean_p": 0.4443537970062359
+    },
+    {
+     "code": 9147,
+     "name": "Management",
+     "n": 380,
+     "dropout_rate": 0.3526315789473684,
+     "within_f1": 0.719724789871932,
+     "lopo_f1": 0.7062836986110382,
+     "within_auc": 0.9115095255430167,
+     "lopo_auc": 0.9140577599805849,
+     "lopo_mean_p": 0.3884554255523236
+    },
+    {
+     "code": 9238,
+     "name": "Social Service",
+     "n": 355,
+     "dropout_rate": 0.18309859154929578,
+     "within_f1": 0.7368948917529314,
+     "lopo_f1": 0.721039694171106,
+     "within_auc": 0.9524137931034483,
+     "lopo_auc": 0.9472148541114059,
+     "lopo_mean_p": 0.23035976721438198
+    },
+    {
+     "code": 9254,
+     "name": "Tourism",
+     "n": 252,
+     "dropout_rate": 0.38095238095238093,
+     "within_f1": 0.6808330651292743,
+     "lopo_f1": 0.6822335665217117,
+     "within_auc": 0.9268162393162394,
+     "lopo_auc": 0.9284188034188035,
+     "lopo_mean_p": 0.348975863738048
+    },
+    {
+     "code": 9500,
+     "name": "Nursing",
+     "n": 766,
+     "dropout_rate": 0.15404699738903394,
+     "within_f1": 0.6584089301022943,
+     "lopo_f1": 0.6418729335396002,
+     "within_auc": 0.9054064657878218,
+     "lopo_auc": 0.8951140405942666,
+     "lopo_mean_p": 0.16475394809224236
+    },
+    {
+     "code": 9556,
+     "name": "Oral Hygiene",
+     "n": 86,
+     "dropout_rate": 0.38372093023255816,
+     "within_f1": 0.7441646997115132,
+     "lopo_f1": 0.7404823327079425,
+     "within_auc": 0.9588336192109777,
+     "lopo_auc": 0.9616923956546598,
+     "lopo_mean_p": 0.35022926591435544
+    },
+    {
+     "code": 9670,
+     "name": "Advertising and Marketing",
+     "n": 268,
+     "dropout_rate": 0.35447761194029853,
+     "within_f1": 0.6937672595134643,
+     "lopo_f1": 0.7399076019765675,
+     "within_auc": 0.9183449954365683,
+     "lopo_auc": 0.9121387283236994,
+     "lopo_mean_p": 0.3407268688884688
+    },
+    {
+     "code": 9773,
+     "name": "Journalism and Communication",
+     "n": 331,
+     "dropout_rate": 0.30513595166163143,
+     "within_f1": 0.6660755256959445,
+     "lopo_f1": 0.659816653934301,
+     "within_auc": 0.8703831252690487,
+     "lopo_auc": 0.8699956952216961,
+     "lopo_mean_p": 0.26858989641194336
+    },
+    {
+     "code": 9853,
+     "name": "Basic Education",
+     "n": 192,
+     "dropout_rate": 0.4427083333333333,
+     "within_f1": 0.5702240430209778,
+     "lopo_f1": 0.5351010101010102,
+     "within_auc": 0.8836723474436503,
+     "lopo_auc": 0.8764156129741617,
+     "lopo_mean_p": 0.3172222488962597
+    },
+    {
+     "code": 9991,
+     "name": "Management (evening)",
+     "n": 268,
+     "dropout_rate": 0.5074626865671642,
+     "within_f1": 0.6624089523329068,
+     "lopo_f1": 0.5936405800289648,
+     "within_auc": 0.9343805704099821,
+     "lopo_auc": 0.9392825311942958,
+     "lopo_mean_p": 0.3935004311955472
+    }
+   ],
+   "summary": {
+    "n_programmes_reported": 16,
+    "zero_units_share_171": 0.8372093023255814,
+    "zero_units_share_other": 0.0,
+    "zero_units_graduates_171": 0.78125,
+    "median_auc_drop": 0.00018754688672167896,
+    "worst_auc_drop": -0.019622226297450807,
+    "n_drop_gt_005": 0,
+    "lopo_auc_min": 0.7287731523931782,
+    "lopo_auc_max": 0.9616923956546598,
+    "worst_programme": "Animation and Multimedia Design",
+    "lowest_auc_programme": "Animation and Multimedia Design",
+    "calib_gap_mean_abs": 0.06232648819542885,
+    "calib_gap_max_abs": 0.22124073021335772,
+    "calib_gap_max_programme": "Animation and Multimedia Design"
+   }
+  }
+ }
+}
