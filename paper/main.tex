@@ -10,6 +10,7 @@
 \usepackage{booktabs}
 \usepackage{caption}
 \usepackage{subcaption}
+\usepackage{float}
 \usepackage[section]{placeins}
 \usepackage[authoryear,round]{natbib}
 \usepackage{xcolor}
@@ -133,7 +134,7 @@ Averaged over the eight models, moving from the binary to the three-class settin
 
 Dropout detection, the task most institutions care about, is much less affected. The probability that the three-class XGBoost model assigns to Dropout ranks dropouts against all other students with an AUC of \multiclassXGBoostaucdropout. This is lower than the binary AUC (\binaryXGBoostaucdropout), but the two numbers answer different questions: the binary model never has to distinguish dropouts from delayed students, who are the hardest cases. The binary figure is therefore an optimistic estimate of how a deployed model would perform on a full cohort.
 
-\begin{figure}[t]
+\begin{figure}[H]
   \centering
   \includegraphics[width=\linewidth]{fig_overview}
   \caption{Macro F1 (left) and macro one-vs-rest AUC (right) for each model and setting. Points are means over 25 cross-validation test folds; bars show $\pm1$ SD across folds. Models are ordered by three-class macro F1.}
@@ -146,7 +147,7 @@ Dropout detection, the task most institutions care about, is much less affected.
 
 \input{generated/tab_tuning}
 
-\begin{figure}[t]
+\begin{figure}[H]
   \centering
   \begin{subfigure}[t]{0.46\linewidth}
     \centering
@@ -178,7 +179,7 @@ Table~\ref{tab:stages} and Figure~\ref{fig:perclass} follow the three-class prob
 
 Figure~\ref{fig:calibration} shows reliability curves for the predicted dropout probability. XGBoost, gradient boosting and logistic regression are close to the diagonal (ECE \eceXGBoost, \eceGradientBoosting{} and \eceLogisticRegression; Brier score \multiclassXGBoostbrierdropout{} for XGBoost). LightGBM is less calibrated (ECE \eceLightGBM). Without recalibration, the probabilities of the better models can be read directly as estimated dropout rates, which makes thresholds easier to set and to explain.
 
-\begin{figure}[t]
+\begin{figure}[H]
   \centering
   \begin{subfigure}[t]{0.46\linewidth}
     \centering
@@ -203,7 +204,7 @@ In each case the model is more sensitive in the group where dropout is common an
 
 \input{generated/tab_subgroups}
 
-\begin{figure}[t]
+\begin{figure}[H]
   \centering
   \includegraphics[width=\linewidth]{fig_subgroups}
   \caption{Dropout recall (left) and false-alert rate (right) by subgroup for XGBoost, with 95\% bootstrap intervals.}
@@ -216,7 +217,7 @@ Figure~\ref{fig:alerts} and Table~\ref{tab:alerts} show what happens when the sc
 
 The high precision at the top of the list also shows a limit. In the first-semester model, \profileToptenZeroApproved\% of the top 10\% passed no first-semester unit at all (against \profileAllZeroApproved\% of all students) and \profileToptenFeesNotUpToDate\% were behind on fees. An adviser looking at grades and payments would find most of these students without a model. The added value of a model lies further down the ranking, where risk is less obvious: in the next 10\%, only \profileNexttenZeroApproved\% passed no unit, and precision is lower.
 
-\begin{figure}[t]
+\begin{figure}[H]
   \centering
   \includegraphics[width=\linewidth]{fig_alert_lists}
   \caption{Fixed-size alert lists at three prediction points (XGBoost, out-of-fold). Left: share of all dropouts reached as more students are contacted, against a random list and a perfect ranking. Right: share of contacted students who drop out, with 95\% bootstrap intervals. Dotted lines: models without the two fee-status variables.}
@@ -229,15 +230,16 @@ Table~\ref{tab:thresholds} turns the subgroup finding of the previous section in
 
 \input{generated/tab_thresholds}
 
+\FloatBarrier
 \subsection{Transfer to unseen programmes}
 
 Within a programme the model never saw, the ranking of students is almost unchanged (Figure~\ref{fig:transfer}). After the first semester, the median change in Dropout AUC across the \trNProg{} programmes with at least 50 students is $\trSemoneXGBoostMedDrop$ for XGBoost and $\trSemoneLogisticRegressionMedDrop$ for logistic regression, and the held-out AUC ranges from \trSemoneXGBoostOutAucMin{} to \trSemoneXGBoostOutAucMax. Pooled over all students, the Dropout AUC falls from \trSemoneXGBoostInAuc{} to \trSemoneXGBoostOutAuc{} for XGBoost and from \trSemoneLogisticRegressionInAuc{} to \trSemoneLogisticRegressionOutAuc{} for logistic regression (Table~\ref{tab:transfer}), so the simpler model transfers better.
 
-Two things explain most of the pooled loss. First, the model misjudges the overall level of dropout in a new programme: the mean predicted dropout probability differs from the observed rate by \trSemoneXGBoostCalGap{} on average (\trSemoneLogisticRegressionCalGap{} for logistic regression). Ranking within the programme survives, but the probabilities need recalibrating to the new programme's base rate. Second, one programme behaves differently. In Animation and Multimedia Design, \trZeroAnim\% of students have no curricular units recorded in either semester, including \trZeroGradAnim\% of those who graduated; no other programme has any such records. When students of this programme are in the training data, the model learns that zeros there do not mean failure; when they are not, it reads the zeros as failure, predicts a mean dropout probability of \trAnimMeanP{} against an observed \trAnimRate{}, and its AUC falls from \trAnimInAuc{} to \trAnimOutAuc. Without this programme, the pooled AUC of XGBoost goes from \trSemoneXGBoostInAucExcl{} to \trSemoneXGBoostOutAucExcl. The same pattern holds after the second semester.
+Two things explain most of the pooled loss. First, the model misjudges the overall level of dropout in a new programme: the mean predicted dropout probability differs from the observed rate by \trSemoneXGBoostCalGap{} on average (\trSemoneLogisticRegressionCalGap{} for logistic regression). Ranking within the programme survives, but the probabilities need recalibrating to the new programme's base rate. Second, one programme behaves differently. In Animation and Multimedia Design, \trZeroAnim\% of students have no curricular units recorded in either semester, including \trZeroGradAnim\% of those who graduated; no other programme has any such records. If students of this programme are in the training data, the model learns that zeros there do not signal failure. If the programme is held out, the model treats the zeros as failure. It then predicts a mean dropout probability of \trAnimMeanP{} against an observed \trAnimRate{}, and the AUC falls from \trAnimInAuc{} to \trAnimOutAuc. Without this programme, the pooled AUC of XGBoost goes from \trSemoneXGBoostInAucExcl{} to \trSemoneXGBoostOutAucExcl. The same pattern holds after the second semester.
 
 For deployment this means that a model trained on other programmes can be used to rank students in a new one, but its probabilities should be recalibrated on that programme's first cohort, and data recording practices should be checked programme by programme. It also shows a data-quality issue in this benchmark that pooled results hide.
 
-\begin{figure}[t]
+\begin{figure}[H]
   \centering
   \includegraphics[width=\linewidth]{fig_transfer}
   \caption{Dropout AUC within each programme after the first semester (XGBoost, programme code removed). Circles: the programme was part of training (repeated CV). Diamonds: the programme was held out. Programmes with fewer than 50 students are omitted from the plot but included in the pooled results.}
@@ -252,7 +254,7 @@ For deployment this means that a model trained on other programmes can be used t
 
 \paragraph{SHAP.} Figure~\ref{fig:shap} shows mean absolute SHAP values and the distribution for the Dropout class. The number of second-semester units approved dominates (mean $|$SHAP$|$ \shapTopOneVal{} averaged over classes), followed by first-semester units approved (\shapTopTwoVal) and whether tuition fees are up to date (\shapTopThreeVal). For the Dropout class, few approved units and unpaid fees both push predictions towards dropout; older age at enrolment does the same. For the Enrolled class, the number of assessments taken in each semester carries almost as much weight as the number of units approved, which is not the case for the other two classes. These are associations learned by the model. They identify where students who drop out differ, not why they drop out; fee arrears, for example, may be a consequence of a decision to leave as much as a cause.
 
-\begin{figure}[t]
+\begin{figure}[H]
   \centering
   \begin{subfigure}[t]{\linewidth}
     \centering
@@ -306,14 +308,14 @@ Tables~\ref{tab:sem1} and~\ref{tab:enrol} give results for all eight models at t
 \input{generated/tab_sem1}
 \input{generated/tab_enrol}
 
-\begin{figure}[ht]
+\begin{figure}[H]
   \centering
   \includegraphics[width=0.85\linewidth]{fig_shap_enrolled}
   \caption{SHAP values for the Enrolled class (XGBoost, held-out 20\% split).}
   \label{fig:shapenrolled}
 \end{figure}
 
-\begin{table}[ht]
+\begin{table}[H]
 \centering
 \small
 \caption{Fixed hyperparameters (all other settings are library defaults; random seed 42).}

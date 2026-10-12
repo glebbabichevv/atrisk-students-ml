@@ -56,7 +56,7 @@ def results_table(setting, cols, caption, label, extra_note=""):
     d = S[S.setting == setting].set_index("model").loc[MODELS]
     best_vals = {c: d[c].max() for c in cols}
     tests = T[T.setting == setting]
-    lines = [r"\begin{table}[t]", r"\centering", r"\small",
+    lines = [r"\begin{table}[H]", r"\centering", r"\small",
              r"\setlength{\tabcolsep}{3.5pt}",
              rf"\caption{{{caption}}}", rf"\label{{{label}}}",
              r"\begin{tabular}{l" + "c" * len(cols) + "}", r"\toprule",
@@ -120,7 +120,7 @@ def stage_table():
         rows.append((lab, bm, g(s, bm, "f1"), g(s, bm, "f1_sd"),
                      g(s, bm, "f1_dropout"), g(s, bm, "f1_enrolled"),
                      g(s, bm, "f1_graduate"), g(s, bm, "auc_dropout")))
-    lines = [r"\begin{table}[t]", r"\centering", r"\small",
+    lines = [r"\begin{table}[H]", r"\centering", r"\small",
              r"\setlength{\tabcolsep}{4pt}", r"\footnotesize",
              r"\caption{Three-class prediction at three points in time. "
              r"Each row reports the model with the highest macro F1 at that stage.}",
@@ -144,7 +144,7 @@ stage_rows = stage_table()
 # ── subgroup table ───────────────────────────────────────────────────────────
 def subgroup_table():
     sub = pd.DataFrame(A["subgroups"])
-    lines = [r"\begin{table}[t]", r"\centering", r"\small",
+    lines = [r"\begin{table}[H]", r"\centering", r"\small",
              r"\setlength{\tabcolsep}{3.5pt}", r"\footnotesize",
              r"\caption{Subgroup results for the best three-class model "
              r"(out-of-fold predictions for all 4{,}424 students, first CV repeat). "
@@ -274,7 +274,7 @@ def cap_row(rows, cap):
 
 
 def alert_table():
-    lines = [r"\begin{table}[t]", r"\centering", r"\small",
+    lines = [r"\begin{table}[H]", r"\centering", r"\small",
              r"\setlength{\tabcolsep}{4pt}",
              r"\caption{Alert lists of fixed size. Students are ranked by the "
              r"out-of-fold XGBoost probability of dropout; the top 10\% or 20\% of the "
@@ -321,7 +321,7 @@ for k_, v_ in D["top_profile"].items():
 
 
 def threshold_table():
-    lines = [r"\begin{table}[t]", r"\centering", r"\small",
+    lines = [r"\begin{table}[H]", r"\centering", r"\small",
              r"\setlength{\tabcolsep}{4pt}",
              r"\caption{One threshold for everyone vs.\ group-specific thresholds that "
              r"give each group the same dropout recall (XGBoost, both semesters). The single threshold flags 20\% "
@@ -370,7 +370,7 @@ for t in D["thresholds"]:
 
 
 def sensitivity_table():
-    lines = [r"\begin{table}[t]", r"\centering", r"\small",
+    lines = [r"\begin{table}[H]", r"\centering", r"\small",
              r"\setlength{\tabcolsep}{4pt}",
              r"\caption{Sensitivity to the two fee-status variables (\emph{Debtor}, "
              r"\emph{Tuition fees up to date}), whose recording time is not documented. "
@@ -401,7 +401,7 @@ for r in SENS:
 TUNE_PATH = RES / "tuning.json"
 if TUNE_PATH.exists():
     TU = json.load(open(TUNE_PATH))
-    lines = [r"\begin{table}[t]", r"\centering", r"\small",
+    lines = [r"\begin{table}[H]", r"\centering", r"\small",
              r"\caption{Fixed hyperparameters vs.\ nested tuning (randomised search, "
              r"inner 3-fold CV on macro F1) in the three-class setting. Mean $\pm$ SD "
              r"over 10 outer folds; $p$: corrected resampled $t$-test, tuned vs.\ fixed.}",
@@ -424,7 +424,7 @@ if TUNE_PATH.exists():
 
 # ── transfer to unseen programmes (transfer.py) ─────────────────────────────
 TR = json.load(open(RES / "transfer.json"))
-lines = [r"\begin{table}[t]", r"\centering", r"\small", r"\setlength{\tabcolsep}{4pt}",
+lines = [r"\begin{table}[H]", r"\centering", r"\small", r"\setlength{\tabcolsep}{4pt}",
          r"\caption{Transfer to unseen degree programmes. \emph{Seen}: repeated 5-fold CV "
          r"over all students. \emph{Held out}: each of the 17 programmes predicted by a model "
          r"trained on the other 16. Both without the programme code. Pooled over all students; "
