@@ -1,0 +1,74 @@
+{
+ "started": "2026-10-21T01:29:50+00:00",
+ "environment": {
+  "python": "3.14.6",
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "packages": {
+   "numpy": "2.5.4",
+   "pandas": "3.0.6",
+   "scipy": "1.18.1",
+   "scikit-learn": "1.9.1",
+   "xgboost": "3.4.1",
+   "lightgbm": "4.7.0",
+   "shap": "0.54.1",
+   "matplotlib": "3.11.2",
+   "joblib": "1.6.0"
+  },
+  "commit": "7ec9838",
+  "code_changed_since_commit": false
+ },
+ "data_sha256": {
+  "data/dataset.csv": "16e1e9e681334afb4f06d82310e750851710aba4b8ab80fbf0b1ca46ad15884b",
+  "data/upv/dataset_2018_hash.csv": "2e5014fc07cb1f991291b12d750b47ed700bf81a5be276b50830c559ddf4d0ef",
+  "data/upv/dataset_2021_hash.csv": "3b116db8d5ac0462aa33dd278237e7878122687df659f27b5a17d555dd539a29",
+  "data/upv/dataset_2022_hash.csv": "a3a091f687d493bc31b3c34bb1e52798b096f3b2a2441c5d91bc549d766af364"
+ },
+ "steps": [
+  {
+   "name": "uci.benchmark",
+   "status": "ok",
+   "seconds": 148.9
+  },
+  {
+   "name": "uci.calibration",
+   "status": "ok",
+   "seconds": 25.0
+  },
+  {
+   "name": "uci.fees",
+   "status": "ok",
+   "seconds": 15.4
+  },
+  {
+   "name": "uci.alerts",
+   "status": "ok",
+   "seconds": 12.5
+  },
+  {
+   "name": "uci.transfer",
+   "status": "ok",
+   "seconds": 27.0
+  },
+  {
+   "name": "uci.tuning",
+   "status": "ok",
+   "seconds": 219.1
+  },
+  {
+   "name": "upv.validation",
+   "status": "ok",
+   "seconds": 432.4
+  },
+  {
+   "name": "report.figures",
+   "status": "ok",
+   "seconds": 0.8
+  },
+  {
+   "name": "report.tables",
+   "status": "ok",
+   "seconds": 1.6
+  }
+ ],
+ "finished": "2026-10-21T01:44:33+00:00"
+}

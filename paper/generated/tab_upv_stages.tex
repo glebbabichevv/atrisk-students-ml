@@ -1,0 +1,20 @@
+\begin{table}[H]
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\caption{Second university (UPV): dropout prediction for first-year entrants at five points in the first year. AUC: mean over 5-fold CV repeated 5 times. \emph{Tied}: models not significantly below the best (corrected $t$-test, $p \ge 0.05$), out of 8. ECE and the top-20\% list use out-of-fold XGBoost predictions. Dropout rate 0.13, so a perfect top-20\% list reaches 1.00.}
+\label{tab:upv_stages}
+\begin{tabular}{lrlcccccc}
+\toprule
+ & & \multicolumn{2}{c}{Best model} & & & & \multicolumn{2}{c}{Top-20\% list} \\
+\cmidrule(lr){3-4}\cmidrule(lr){8-9}
+Information used & Features & Model & AUC & LR AUC & Tied & ECE & Precision & Reach \\
+\midrule
+Enrolment & 94 & Logistic Regression & 0.740 & 0.740 & 5 & 0.018 & 0.31 & 0.47 \\
++ 1st semester & 97 & XGBoost & 0.819 & 0.816 & 5 & 0.014 & 0.42 & 0.64 \\
++ LMS to January & 108 & Gradient Boosting & 0.828 & 0.825 & 5 & 0.016 & 0.42 & 0.65 \\
++ 2nd semester & 104 & XGBoost & 0.891 & 0.889 & 5 & 0.011 & 0.50 & 0.77 \\
++ LMS to June & 114 & Logistic Regression & 0.891 & 0.891 & 6 & 0.008 & 0.50 & 0.76 \\
+\bottomrule
+\end{tabular}
+\end{table}

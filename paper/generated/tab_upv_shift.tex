@@ -1,0 +1,20 @@
+\begin{table}[H]
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\caption{UPV: dropout AUC for logistic regression (LR) and XGBoost when the model meets students unlike its training data. \emph{CV}: repeated 5-fold CV over all cohorts. Later cohorts: trained on earlier entry years only. \emph{Unseen degree}: 5-fold CV grouped by degree, degree indicators removed.}
+\label{tab:upv_shift}
+\begin{tabular}{lcccccccc}
+\toprule
+ & \multicolumn{2}{c}{CV} & \multicolumn{2}{c}{2018 $\to$ 2021} & \multicolumn{2}{c}{2018, 2021 $\to$ 2022} & \multicolumn{2}{c}{Unseen degree} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}\cmidrule(lr){8-9}
+Information used & LR & XGB & LR & XGB & LR & XGB & LR & XGB \\
+\midrule
+Enrolment & 0.740 & 0.735 & 0.625 & 0.633 & 0.736 & 0.711 & -- & -- \\
++ 1st semester & 0.816 & 0.819 & 0.751 & 0.762 & 0.755 & 0.734 & 0.706 & 0.729 \\
++ LMS to January & 0.825 & 0.825 & 0.742 & 0.765 & 0.780 & 0.741 & 0.705 & 0.729 \\
++ 2nd semester & 0.889 & 0.891 & 0.851 & 0.842 & 0.811 & 0.800 & 0.796 & 0.821 \\
++ LMS to June & 0.891 & 0.891 & 0.839 & 0.852 & 0.820 & 0.802 & -- & -- \\
+\bottomrule
+\end{tabular}
+\end{table}

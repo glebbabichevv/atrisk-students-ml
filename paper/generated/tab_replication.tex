@@ -1,0 +1,24 @@
+\begin{table}[H]
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\caption{Main findings at the first university (UCI, Portugal) and the same quantities at the second (UPV, Spain). UCI: three-class model, P(dropout) scored as dropout vs.\ rest; low-dropout group: scholarship holders. UPV: binary model; low-dropout group: full-time students. Lists and thresholds use out-of-fold XGBoost predictions. Changes in AUC are relative to repeated CV on the same features. UCI has a single cohort, so no later-cohort test is possible.}
+\label{tab:replication}
+\begin{tabular}{p{7.2cm}cc}
+\toprule
+Quantity & UCI & UPV \\
+\midrule
+Models tied with the best, AUC after 1st semester (of 8) & 4 & 5 \\
+Dropout AUC: enrolment / 1st semester / end of year & 0.82 / 0.91 / 0.93 & 0.74 / 0.82 / 0.89 \\
+Share of the first-year AUC gain present after 1st semester & 82\% & 52\% \\
+Calibration error (ECE), end of year, XGBoost & 0.019 & 0.011 \\
+Top-20\% list, end of year: precision (lift over base rate) & 0.94 (2.9$\times$) & 0.50 (3.8$\times$) \\
+Top-20\% list, end of year: reach & 0.59 & 0.77 \\
+Recall, low- vs.\ high-dropout group, one threshold & 0.38 vs.\ 0.61 & 0.76 vs.\ 0.88 \\
+\quad same, with group-specific thresholds & 0.57 vs.\ 0.59 & 0.77 vs.\ 0.75 \\
+AUC change, unseen programme, LR / XGBoost & -0.007 / -0.025 & -0.110 / -0.090 \\
+AUC change, later cohort (2018 $\to$ 2021), LR / XGBoost & -- & -0.066 / -0.057 \\
+AUC change, later cohort (2018, 2021 $\to$ 2022), LR / XGBoost & -- & -0.062 / -0.085 \\
+\bottomrule
+\end{tabular}
+\end{table}
