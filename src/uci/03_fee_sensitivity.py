@@ -5,7 +5,7 @@ were recorded. If they were updated after a student stopped attending, they
 would leak the outcome. We therefore repeat the three-class analysis at each
 prediction point without them.
 
-Run:  python src/sensitivity.py
+UCI step 3.
 """
 from __future__ import annotations
 
@@ -21,11 +21,10 @@ from sklearn.metrics import f1_score, roc_auc_score
 from sklearn.model_selection import RepeatedStratifiedKFold
 
 warnings.filterwarnings("ignore")
-sys.path.insert(0, str(Path(__file__).parent))
-from data import load_dataset, setting_xy  # noqa: E402
-from experiments import SEED, get_models  # noqa: E402
-
-RES = Path(__file__).resolve().parent.parent / "results"
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from common.models import SEED, get_models  # noqa: E402
+from common.paths import UCI_RESULTS as RES  # noqa: E402
+from uci.data import load_dataset, setting_xy  # noqa: E402
 MODELS = ["XGBoost", "Logistic Regression"]
 
 

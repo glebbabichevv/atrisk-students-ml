@@ -1,35 +1,55 @@
 # Predicting Dropout and Delayed Completion in Higher Education
 
-[![License: MIT](https://img.shields.io/badge/code-MIT-blue.svg)](LICENSE) [![Data: CC BY 4.0](https://img.shields.io/badge/data-CC%20BY%204.0-green.svg)](data/README.md)
+[![License: MIT](https://img.shields.io/badge/code-MIT-blue.svg)](LICENSE) [![Data: CC BY 4.0](https://img.shields.io/badge/data-CC%20BY%204.0-green.svg)](data/README.md) [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](requirements.txt)
 
 Code and paper for *Predicting Dropout and Delayed Completion in Higher Education: Outcome Definition, Prediction Time and Evaluation on a Public Benchmark* (Gleb Babichev, 2026).
 
-Every number, table and figure in `paper/` is produced by the scripts in `src/`. Nothing in the paper is typed by hand.
+The main study uses the public UCI dataset from a Portuguese polytechnic. Its findings are then checked on a second university, Universitat Politècnica de València (Spain), with a different dropout definition, three entry cohorts and learning-platform activity.
+
+Every number, table and figure in `paper/` is produced by `run_all.py`. Nothing in the paper is typed by hand.
 
 ## Data
 
-UCI *Predict Students' Dropout and Academic Success* (Realinho et al., 2022), DOI [10.24432/C5MC89](https://doi.org/10.24432/C5MC89), CC BY 4.0. 4,424 students, 36 features, three outcomes recorded at the end of the normal course duration: Dropout, Enrolled (still enrolled, i.e. delayed) and Graduate.
-
-A copy is included in `data/dataset.csv` (CC BY 4.0, see `data/README.md`).
+- **UCI, Portugal** (main study): *Predict Students' Dropout and Academic Success* (Realinho et al., 2022), DOI [10.24432/C5MC89](https://doi.org/10.24432/C5MC89), CC BY 4.0. 4,424 students, 36 features, three outcomes recorded at the end of the normal course duration: Dropout, Enrolled (still enrolled, i.e. delayed) and Graduate. Included as `data/dataset.csv`.
+- **UPV, Spain** (external validation): Igualde-Sáez et al. (2025), DOI [10.5281/zenodo.17239943](https://doi.org/10.5281/zenodo.17239943), CC BY 4.0. 9,359 first-year entrants from 2018, 2021 and 2022, with LMS and Wi-Fi activity. Download separately, see `data/README.md`.
 
 ## Reproduce
 
 ```bash
+python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-python run_all.py                 # ~70 min on 2 cores
-cd paper && latexmk -pdf main.tex
+python run_all.py --list          # the steps
+python run_all.py                 # every step
+python run_all.py --paper         # same, then build paper/main.pdf
 ```
 
-| Script | What it does |
-|---|---|
-| `src/data.py` | loading, column clean-up, the four settings (binary, three-class, first semester, enrolment) |
-| `src/experiments.py` | 8 models x 4 settings, 5-fold CV repeated 5 times, corrected resampled t-tests |
-| `src/analysis.py` | calibration, subgroup errors with bootstrap CIs, feature selection inside CV, SHAP, all figures |
-| `src/sensitivity.py` | repeats the three-class analysis without the two fee-status variables |
-| `src/decision.py` | fixed-size alert lists (precision and reach) and group-specific thresholds (cross-fitted) |
-| `src/transfer.py` | leave-one-programme-out validation (17 programmes) |
-| `src/tuning.py` | nested CV with randomised search for four models |
-| `src/make_tables.py` | writes `paper/generated/` (tables and `\newcommand` number macros) |
+Other options: `--only upv` (a group or step names), `--skip uci.tuning` (the slowest step; its table is then taken from the last run), `--from uci.alerts` (resume after a failure). Each run saves logs to `results/logs/` and a record of the commit, library versions, data checksums and step durations to `results/run_manifest.json`.
+
+## Code
+
+```
+run_all.py                         entry point
+src/common/   paths.py             all file locations
+              models.py            the 8 models, seed, corrected resampled t-test
+              decision.py          alert lists and group thresholds (same code for both datasets)
+              plotting.py          figure style
+src/uci/      data.py              loading, the four settings, out-of-fold predictions
+              01_benchmark.py      8 models x 4 settings, 5-fold CV repeated 5 times
+              02_calibration_subgroups_shap.py
+                                   calibration, subgroup errors, feature selection inside CV, SHAP
+              03_fee_sensitivity.py  three-class analysis without the two fee-status variables
+              04_alerts_and_thresholds.py
+                                   fixed-size alert lists, group-specific thresholds (cross-fitted)
+              05_programme_transfer.py  leave-one-programme-out validation (17 programmes)
+              06_nested_tuning.py  nested CV: fixed vs tuned hyperparameters
+src/upv/      data.py              first-year entrants, five prediction points
+              01_external_validation.py
+                                   CV, calibration, alert lists, temporal and unseen-degree
+                                   validation, subgroup thresholds, resit check
+src/report/   make_figures.py      figure comparing the two universities
+              make_tables.py       paper/generated/: tables and \newcommand number macros
+results/uci/, results/upv/         outputs of the steps
+```
 
 ## Main results
 

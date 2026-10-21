@@ -11,8 +11,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-ROOT = Path(__file__).resolve().parent.parent
-DATA_PATH = ROOT / "data" / "dataset.csv"
+from common.paths import UCI_DATA as DATA_PATH, UCI_RESULTS  # noqa: E402
 
 CLASS_NAMES = ["Dropout", "Enrolled", "Graduate"]
 CLASS_MAP = {c: i for i, c in enumerate(CLASS_NAMES)}
@@ -80,3 +79,9 @@ if __name__ == "__main__":
     for s in ["binary", "multiclass", "sem1", "enrol"]:
         X, y, c = setting_xy(df, s)
         print(s, X.shape, np.bincount(y))
+
+
+def load_oof(setting: str):
+    """Out-of-fold class probabilities saved by step 1 (first CV repeat)."""
+    z = np.load(UCI_RESULTS / f"oof_{setting}.npz")
+    return z["y"], {k.replace("_", " "): z[k] for k in z.files if k != "y"}

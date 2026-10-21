@@ -4,10 +4,10 @@ Nested cross-validation: does hyperparameter tuning change the conclusions?
 Outer loop: stratified 5-fold CV repeated twice (10 test folds), three-class
 setting with all features. Inner loop: randomised search (3-fold CV, macro F1)
 on the outer training part only. The tuned model is compared with the fixed
-configuration from experiments.py on the same outer folds, using the corrected
+configuration of step 1 on the same outer folds, using the corrected
 resampled t-test.
 
-Run:  python src/tuning.py      (about 30-40 minutes on 2 cores)
+UCI step 6 (optional, about 20-40 minutes):  python run_all.py --with-tuning
 """
 from __future__ import annotations
 
@@ -25,12 +25,11 @@ from sklearn.model_selection import (RandomizedSearchCV, RepeatedStratifiedKFold
                                      StratifiedKFold)
 
 warnings.filterwarnings("ignore")
-sys.path.insert(0, str(Path(__file__).parent))
-from data import load_dataset, setting_xy  # noqa: E402
-from experiments import SEED, corrected_ttest, get_models  # noqa: E402
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from common.models import SEED, corrected_ttest, get_models  # noqa: E402
+from common.paths import UCI_RESULTS as RES  # noqa: E402
+from uci.data import load_dataset, setting_xy  # noqa: E402
 
-ROOT = Path(__file__).resolve().parent.parent
-RES = ROOT / "results"
 
 SPACES = {
     "Logistic Regression": ({"logisticregression__C": loguniform(1e-3, 1e2)}, 20),

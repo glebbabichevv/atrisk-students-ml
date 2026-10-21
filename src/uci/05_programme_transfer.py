@@ -8,8 +8,7 @@ programme would have an unseen code. As the in-distribution reference, the same
 model (also without `Course`) is evaluated with 5-fold CV repeated 5 times over
 all students; the first repeat gives one out-of-fold prediction per student.
 
-Outputs: results/transfer.json, paper/figures/fig_transfer.pdf
-Run:  python src/transfer.py
+UCI step 5. Outputs: results/uci/transfer.json, paper/figures/fig_transfer.pdf
 """
 from __future__ import annotations
 
@@ -18,22 +17,18 @@ import sys
 import warnings
 from pathlib import Path
 
-import matplotlib
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt  # noqa: E402
-import numpy as np  # noqa: E402
-from joblib import Parallel, delayed  # noqa: E402
-from sklearn.base import clone  # noqa: E402
-from sklearn.metrics import f1_score, roc_auc_score  # noqa: E402
-from sklearn.model_selection import RepeatedStratifiedKFold  # noqa: E402
+import numpy as np
+from joblib import Parallel, delayed
+from sklearn.base import clone
+from sklearn.metrics import f1_score, roc_auc_score
+from sklearn.model_selection import RepeatedStratifiedKFold
 
 warnings.filterwarnings("ignore")
-sys.path.insert(0, str(Path(__file__).parent))
-from analysis import C, FIG, INK2, save  # noqa: E402
-from data import load_dataset, setting_xy  # noqa: E402
-from experiments import SEED, get_models  # noqa: E402
-
-RES = Path(__file__).resolve().parent.parent / "results"
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from common.models import SEED, get_models  # noqa: E402
+from common.paths import UCI_RESULTS as RES  # noqa: E402
+from common.plotting import C, INK2, plt, save  # noqa: E402
+from uci.data import load_dataset, setting_xy  # noqa: E402
 MODELS = ["XGBoost", "Logistic Regression"]
 STAGES = ["sem1", "multiclass"]
 NAMES = {

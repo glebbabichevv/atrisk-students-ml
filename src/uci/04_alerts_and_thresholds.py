@@ -11,7 +11,7 @@ From scores to decisions.
    Thresholds are chosen by cross-fitting: on four folds of students, applied
    to the fifth, so no student's own label sets the threshold used for them.
 
-Run after experiments.py:  python src/decision.py
+UCI step 4. Needs steps 1 and 3.
 """
 from __future__ import annotations
 
@@ -19,30 +19,18 @@ import json
 import sys
 from pathlib import Path
 
-import matplotlib
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt  # noqa: E402
-import numpy as np  # noqa: E402
-from sklearn.model_selection import StratifiedKFold  # noqa: E402
+import numpy as np
 
-sys.path.insert(0, str(Path(__file__).parent))
-from analysis import C, FIG, INK2, RES, load_oof, save  # noqa: E402,F401
-from data import load_dataset  # noqa: E402
-from experiments import SEED  # noqa: E402
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from common.decision import CAPS, group_thresholds, topk_metrics  # noqa: E402
+from common.models import SEED  # noqa: E402
+from common.paths import UCI_RESULTS as RES  # noqa: E402
+from common.plotting import C, INK2, plt, save  # noqa: E402
+from uci.data import load_dataset, load_oof  # noqa: E402
 
 MODEL = "XGBoost"
 STAGES = [("enrol", "At enrolment"), ("sem1", "After 1st semester"),
           ("multiclass", "After 2nd semester")]
-CAPS = [0.05, 0.10, 0.15, 0.20, 0.25, 0.30, 0.40, 0.50]
-
-
-def topk_metrics(p, is_drop, cap):
-    n = len(p)
-    k = int(round(cap * n))
-    flagged = np.zeros(n, bool)
-    flagged[np.argsort(-p, kind="stable")[:k]] = True
-    tp = (flagged & is_drop).sum()
-    return tp / k, tp / is_drop.sum()
 
 
 def stage_scores(setting, fees=True):
@@ -113,43 +101,10 @@ def alert_lists():
     return out, base
 
 
-def group_thresholds(df, attr, groups, cap=0.20, n_splits=5):
-    """Single global threshold vs per-group thresholds that match the global
-    recall inside each group. Cross-fitted over student folds."""
+def scholarship_age_thresholds(df, attr, groups):
+    """Thresholds on the full-year three-class model, P(dropout) from XGBoost."""
     y, oof = load_oof("multiclass")
-    p = oof[MODEL][:, 0]
-    d = (y == 0)
-    g = np.full(len(y), -1)
-    for gi, mask in enumerate(groups.values()):
-        g[mask] = gi
-    strat = d.astype(int) * 10 + g
-    skf = StratifiedKFold(n_splits, shuffle=True, random_state=SEED)
-    flag_single = np.zeros(len(y), bool)
-    flag_group = np.zeros(len(y), bool)
-    for tr, te in skf.split(p, strat):
-        t_single = np.quantile(p[tr], 1 - cap)
-        target = (p[tr][d[tr]] >= t_single).mean()  # global recall on training part
-        flag_single[te] = p[te] >= t_single
-        for gi in range(len(groups)):
-            m_tr = (g[tr] == gi) & d[tr]
-            # threshold giving the same recall within this group's dropouts
-            t_g = np.quantile(p[tr][m_tr], 1 - target)
-            m_te = g[te] == gi
-            flag_group[te[m_te]] = p[te[m_te]] >= t_g
-    rows = []
-    for name, flag in [("single", flag_single), ("per-group", flag_group)]:
-        for gi, gname in enumerate(groups):
-            m = g == gi
-            rows.append({"policy": name, "group": gname, "n": int(m.sum()),
-                         "recall": float((flag & d & m).sum() / (d & m).sum()),
-                         "fpr": float((flag & ~d & m).sum() / (~d & m).sum()),
-                         "alerts": int((flag & m).sum())})
-        rows.append({"policy": name, "group": "All", "n": len(y),
-                     "recall": float((flag & d).sum() / d.sum()),
-                     "fpr": float((flag & ~d).sum() / (~d).sum()),
-                     "alerts": int(flag.sum()),
-                     "precision": float((flag & d).sum() / flag.sum())})
-    return {"attribute": attr, "capacity": cap, "rows": rows}
+    return group_thresholds(oof[MODEL][:, 0], y == 0, groups, attr)
 
 
 def main():
@@ -157,10 +112,10 @@ def main():
     al, base = alert_lists()
     age = df["Age at enrollment"].to_numpy()
     thr = [
-        group_thresholds(df, "Scholarship", {
+        scholarship_age_thresholds(df, "Scholarship", {
             "No": df["Scholarship holder"].to_numpy() == 0,
             "Yes": df["Scholarship holder"].to_numpy() == 1}),
-        group_thresholds(df, "Age at enrolment", {
+        scholarship_age_thresholds(df, "Age at enrolment", {
             "<=20": age <= 20, "21-25": (age > 20) & (age <= 25), ">25": age > 25}),
     ]
     # who is at the top of the list? (first-semester model)

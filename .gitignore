@@ -26,4 +26,9 @@ paper/*.out
 paper/*.pdf
 paper/*.fdb_latexmk
 paper/*.fls
-results/*.npz
+results/**/*.npz
+results/logs/
+
+# UPV raw data (download from Zenodo, see data/README.md) and its per-student table
+data/upv/
+results/upv/upv_students.csv

@@ -15,6 +15,7 @@ keywords:
   - educational data mining
   - calibration
   - algorithmic fairness
+  - external validation
 references:
   - type: dataset
     title: "Predict Students' Dropout and Academic Success"
@@ -29,4 +30,30 @@ references:
         given-names: Luís
     doi: 10.24432/C5MC89
     year: 2021
+    license: CC-BY-4.0
+  - type: dataset
+    title: "StudentDropoutDataset"
+    authors:
+      - family-names: Igualde-Sáez
+        given-names: Arnau
+      - family-names: Maheut
+        given-names: Julien
+      - family-names: Garcia-Sabater
+        given-names: Jose P.
+      - family-names: Marin-Garcia
+        given-names: Juan A.
+      - family-names: Turro
+        given-names: Carlos
+      - family-names: Despujol Zabala
+        given-names: Ignacio
+      - family-names: Puche Garcia
+        given-names: Sergio
+      - family-names: Alonso
+        given-names: Marina
+      - family-names: Benlloch-Dualde
+        given-names: Jose V.
+      - family-names: Soriano Jiménez
+        given-names: Pedro Pablo
+    doi: 10.5281/zenodo.17239943
+    year: 2025
     license: CC-BY-4.0

@@ -1,7 +1,7 @@
 """
-Secondary analyses and all paper figures (vector PDF).
+UCI step 2: calibration, subgroups, nested feature selection, SHAP, figures.
 
-Needs the outputs of src/experiments.py. Run:  python src/analysis.py
+UCI step 2. Needs the outputs of step 1.
 
   * calibration of the dropout probability (out-of-fold, first CV repeat)
   * subgroup analysis (gender, scholarship, age at enrolment) with bootstrap CIs
@@ -15,57 +15,25 @@ import sys
 import warnings
 from pathlib import Path
 
-import matplotlib
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt  # noqa: E402
-import numpy as np  # noqa: E402
-import pandas as pd  # noqa: E402
-from sklearn.base import clone  # noqa: E402
-from sklearn.calibration import calibration_curve  # noqa: E402
-from sklearn.feature_selection import SelectKBest, f_classif  # noqa: E402
-from sklearn.metrics import confusion_matrix, f1_score  # noqa: E402
-from sklearn.model_selection import (RepeatedStratifiedKFold,  # noqa: E402
-                                     cross_val_score, train_test_split)
-from sklearn.pipeline import make_pipeline  # noqa: E402
+import numpy as np
+import pandas as pd
+from sklearn.base import clone
+from sklearn.calibration import calibration_curve
+from sklearn.feature_selection import SelectKBest, f_classif
+from sklearn.metrics import confusion_matrix, f1_score
+from sklearn.model_selection import (RepeatedStratifiedKFold, cross_val_score,
+                                     train_test_split)
+from sklearn.pipeline import make_pipeline
 
 warnings.filterwarnings("ignore")
-sys.path.insert(0, str(Path(__file__).parent))
-from data import CLASS_NAMES, load_dataset, setting_xy  # noqa: E402
-from experiments import SEED, get_models  # noqa: E402
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from common.models import SEED, get_models  # noqa: E402
+from common.paths import UCI_RESULTS as RES  # noqa: E402
+from common.plotting import C, FIG, INK, INK2, plt, save  # noqa: E402
+from uci.data import CLASS_NAMES, load_dataset, load_oof, setting_xy  # noqa: E402
 
-ROOT = Path(__file__).resolve().parent.parent
-RES = ROOT / "results"
-FIG = ROOT / "paper" / "figures"
-FIG.mkdir(parents=True, exist_ok=True)
-
-# Validated categorical palette (dataviz reference instance), fixed order.
-C = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#008300",
-     "#6250d6", "#e34948"]
-INK, INK2, GRID = "#0b0b0b", "#52514e", "#e4e3df"
 SETTING_LABEL = {"binary": "Binary (D vs G)", "multiclass": "3-class, both semesters",
                  "sem1": "3-class, 1st semester only", "enrol": "3-class, enrolment only"}
-
-plt.rcParams.update({
-    "font.family": "DejaVu Sans", "font.size": 8.5, "axes.titlesize": 9,
-    "axes.labelsize": 8.5, "xtick.labelsize": 8, "ytick.labelsize": 8,
-    "legend.fontsize": 8, "axes.edgecolor": INK2, "axes.labelcolor": INK,
-    "xtick.color": INK2, "ytick.color": INK2, "text.color": INK,
-    "axes.spines.top": False, "axes.spines.right": False,
-    "axes.grid": True, "grid.color": GRID, "grid.linewidth": 0.6,
-    "axes.axisbelow": True, "pdf.fonttype": 42, "savefig.bbox": "tight",
-    "legend.frameon": False,
-})
-
-
-def save(fig, name):
-    fig.savefig(FIG / f"{name}.pdf")
-    plt.close(fig)
-
-
-def load_oof(setting):
-    z = np.load(RES / f"oof_{setting}.npz")
-    y = z["y"]
-    return y, {k.replace("_", " "): z[k] for k in z.files if k != "y"}
 
 
 def boot_ci(fn, idx_groups, n=1000, seed=SEED):
@@ -295,7 +263,8 @@ def shap_analysis(df):
             ax_.yaxis.label.set_size(9)
         for t in f.axes[0].get_yticklabels():
             t.set_fontsize(8)
-        f.savefig(FIG / f"fig_shap_{cname}.pdf", bbox_inches="tight")
+        f.savefig(FIG / f"fig_shap_{cname}.pdf", bbox_inches="tight",
+                  metadata={"CreationDate": None, "ModDate": None})
         plt.close(f)
 
     # direction check for text: correlation between feature value and SHAP (dropout)
