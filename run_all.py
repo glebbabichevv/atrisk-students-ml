@@ -9,7 +9,8 @@
 
 Each step is a standalone script in src/. Its output is also saved to
 results/logs/<step>.log. results/run_manifest.json records the commit, library
-versions, data checksums and step durations of the last run.
+versions, data checksums and step durations of the last full run; partial runs
+are recorded in results/logs/last_partial_run.json.
 """
 from __future__ import annotations
 
@@ -223,8 +224,13 @@ def main() -> None:
                               for f in UCI_FILES + UPV_FILES if f.exists()},
               "steps": []}
 
+    # Only a run of every step describes the committed results; partial runs
+    # (--only, --skip, --from, missing data) are logged next to the step logs.
+    full = len(steps) == len(STEPS)
+    target = MANIFEST if full else LOGS / "last_partial_run.json"
+
     def save_record():
-        MANIFEST.write_text(json.dumps(record, indent=1) + "\n")
+        target.write_text(json.dumps(record, indent=1) + "\n")
         DURATIONS.write_text(json.dumps(durations, indent=1) + "\n")
 
     print("Plan: " + " → ".join(s.name for s in steps) + "\n")
@@ -254,7 +260,7 @@ def main() -> None:
     for s in record["steps"]:
         print(f"  {s['name']:16s} {fmt(s['seconds']):>9s}")
     print(f"  {'total':16s} {fmt(time.time() - t_all):>9s}")
-    print("Run record: results/run_manifest.json")
+    print(f"Run record: {target.relative_to(ROOT)}")
 
     if args.paper:
         build_paper()
