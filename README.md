@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/code-MIT-blue.svg)](LICENSE) [![Data: CC BY 4.0](https://img.shields.io/badge/data-CC%20BY%204.0-green.svg)](data/README.md) [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](requirements.txt)
 
-Code and paper for *Predicting Dropout and Delayed Completion in Higher Education: Outcome Definition, Prediction Time and Evaluation on a Public Benchmark* (Gleb Babichev, 2026).
+Code and paper for *Predicting Dropout and Delayed Completion in Higher Education: Outcome Definition, Prediction Time and a Replication at a Second University* (Gleb Babichev, 2026).
 
 The main study uses the public UCI dataset from a Portuguese polytechnic. Its findings are then checked on a second university, Universitat Politècnica de València (Spain), with a different dropout definition, three entry cohorts and learning-platform activity.
 
@@ -53,14 +53,16 @@ results/uci/, results/upv/         outputs of the steps
 
 ## Main results
 
-| Setting | Best macro F1 | Notes |
+| UCI (Portugal) | Best macro F1 | Notes |
 |---|---|---|
 | Binary (Dropout vs Graduate) | 0.905 | 7 of 8 models statistically tied |
-| Three-class, both semesters | 0.712 (XGBoost) | F1: Dropout 0.794, Enrolled 0.483, Graduate 0.859; Dropout AUC 0.926 |
+| Three-class, both semesters | 0.712 (XGBoost) | F1: Dropout 0.795, Enrolled 0.482, Graduate 0.860; Dropout AUC 0.926 |
 | Three-class, first semester | 0.673 | Dropout AUC 0.905 |
 | Three-class, enrolment only | 0.551 | Dropout AUC 0.817 |
 
-After one semester, a list of the 20% highest-risk students reaches 57% of eventual dropouts with 92% precision. Group-specific thresholds raise dropout recall for scholarship holders from 0.37 to 0.57 at almost no cost in precision. Nested tuning does not change any result significantly.
+After one semester, a list of the 20% highest-risk students reaches 57% of eventual dropouts with 92% precision. Group-specific thresholds raise dropout recall for scholarship holders from 0.38 to 0.57 at almost no cost in precision. Nested tuning does not change any result significantly.
+
+At UPV (Spain, 9,359 first-year students, dropout vs. all others), the dropout AUC is 0.74 at enrolment, 0.82 after the first semester and 0.89 at the end of the year, with 5 of 8 models tied. The recall gap between low- and high-dropout groups and its correction by group thresholds replicate. Models trained on earlier cohorts lose about 0.06 AUC on later ones, and neither logistic regression nor XGBoost transfers consistently better. `paper/generated/tab_replication.tex` puts both universities side by side.
 
 ## Citation
 

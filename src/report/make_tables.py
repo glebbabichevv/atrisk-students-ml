@@ -666,8 +666,8 @@ def replication_table(U):
     cal_uci = A["calibration"]["XGBoost"]["ece"]
     cal_upv = U["calibration"]["year"]["XGBoost"]["ece"]
 
-    def lr_xgb(d):
-        return f"{d['Logistic Regression']:+.3f} / {d['XGBoost']:+.3f}"
+    def lr_xgb(d):  # math minus signs in the table
+        return f"{d['Logistic Regression']:+.3f} / {d['XGBoost']:+.3f}".replace("-", "$-$")
 
     rows = [
         (r"Models tied with the best, AUC after 1st semester (of 8)", f"{tied_uci}", f"{tied_upv}"),
