@@ -48,7 +48,7 @@ Most dropout-prediction studies on the public UCI \emph{Predict Students' Dropou
 
 Universities that want to reduce dropout increasingly use predictive models to decide which students should receive advising or financial support \citep{arnold2012,jayaprakash2014}. Educational data mining has produced a large literature on such models \citep{romero2010,romero2020,namoun2021,mduma2019}, and since its release in 2021 the UCI \emph{Predict Students' Dropout and Academic Success} dataset \citep{realinho2021uci,realinho2022} has become a common benchmark for them \citep{martins2021,villar2024,gu2026,vo2026}.
 
-Three choices in how this benchmark is used affect what the reported numbers mean.
+Several choices in how this benchmark is used, and one property of the data, affect what the reported numbers mean.
 
 \emph{The outcome definition.} The dataset has three labels: Dropout, Graduate and Enrolled. Many studies remove the Enrolled students and report binary results, and those that keep them often describe Enrolled as an unresolved outcome. According to the dataset authors, however, the label is assigned at the end of the normal duration of the course \citep{realinho2022}. An Enrolled student is one who is still registered after the degree should have been completed. This is a delay that matters to an institution in its own right, and the data record it.
 
@@ -56,7 +56,9 @@ Three choices in how this benchmark is used affect what the reported numbers mea
 
 \emph{The evaluation protocol.} Results on this dataset are often reported for a single train/test split, and model rankings are read from differences in the third decimal place. With about 900 test students, such differences are usually within sampling noise.
 
-This paper revisits the benchmark with these three points in mind. We ask:
+\emph{The data source.} All of these students come from one polytechnic institute. A result found there may depend on how that institute records its data, and Section~\ref{sec:transfer} finds one programme where it does. Findings about dropout can be checked at another university, and we do so with open data from Spain that define dropout differently.
+
+This paper revisits the benchmark with these four points in mind. We ask:
 
 \begin{description}
   \item[RQ1] How much do established classifiers differ on binary dropout prediction once sampling variation is accounted for?
@@ -239,24 +241,6 @@ Table~\ref{tab:thresholds} turns the subgroup finding of the previous section in
 
 \input{generated/tab_thresholds}
 
-\FloatBarrier
-\subsection{Transfer to unseen programmes}
-
-Within a programme the model never saw, the ranking of students is almost unchanged (Figure~\ref{fig:transfer}). After the first semester, the median change in Dropout AUC across the \trNProg{} programmes with at least 50 students is $\trSemoneXGBoostMedDrop$ for XGBoost and $\trSemoneLogisticRegressionMedDrop$ for logistic regression, and the held-out AUC ranges from \trSemoneXGBoostOutAucMin{} to \trSemoneXGBoostOutAucMax. Pooled over all students, the Dropout AUC falls from \trSemoneXGBoostInAuc{} to \trSemoneXGBoostOutAuc{} for XGBoost and from \trSemoneLogisticRegressionInAuc{} to \trSemoneLogisticRegressionOutAuc{} for logistic regression (Table~\ref{tab:transfer}), so here the simpler model transfers better. Section~\ref{sec:upv} shows that this does not carry over to the second university.
-
-Most of the pooled loss comes from the overall level of dropout in a new programme, which the model misjudges. Its mean predicted dropout probability differs from the observed rate by \trSemoneXGBoostCalGap{} on average (\trSemoneLogisticRegressionCalGap{} for logistic regression). Ranking within the programme survives, but the probabilities need recalibrating to the new programme's base rate. In Animation and Multimedia Design, \trZeroAnim\% of students have no curricular units recorded in either semester, including \trZeroGradAnim\% of those who graduated; no other programme has any such records. When the programme is part of the training data, its own students teach the model that these zeros do not signal failure, and when it is held out the zeros are read as failure. It then predicts a mean dropout probability of \trAnimMeanP{} against an observed \trAnimRate{}, and the AUC falls from \trAnimInAuc{} to \trAnimOutAuc. Without this programme, the pooled AUC of XGBoost goes from \trSemoneXGBoostInAucExcl{} to \trSemoneXGBoostOutAucExcl. The same pattern holds after the second semester.
-
-A model trained on other programmes can rank students in a new one. Its probabilities should be recalibrated on that programme's first cohort, and each programme's data recording should be checked before use.
-
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=\linewidth]{fig_transfer}
-  \caption{Dropout AUC within each programme after the first semester (XGBoost, programme code removed). Circles: the programme was part of training (repeated CV). Diamonds: the programme was held out. Programmes with fewer than 50 students are omitted from the plot but included in the pooled results.}
-  \label{fig:transfer}
-\end{figure}
-
-\input{generated/tab_transfer}
-
 \subsection{Features}
 
 \paragraph{Feature selection.} With selection performed inside cross-validation, no reduced feature set improved on all 36 features (Figure~\ref{fig:fs}; macro F1 \fsFull). Keeping 30 features (\fsKthreezero) stays within one standard deviation of the full model; keeping 20 gives \fsKtwozero{} and keeping 10 gives \fsKonezero. A selection step evaluated on the test split can make small feature sets look as good as the full set; this does not hold up when the selection is part of the training procedure.
@@ -280,16 +264,35 @@ A model trained on other programmes can rank students in a new one. Its probabil
 \end{figure}
 
 \FloatBarrier
+\subsection{Transfer to unseen programmes}
+\label{sec:transfer}
+
+Within a programme the model never saw, the ranking of students is almost unchanged (Figure~\ref{fig:transfer}). After the first semester, the median change in Dropout AUC across the \trNProg{} programmes with at least 50 students is $\trSemoneXGBoostMedDrop$ for XGBoost and $\trSemoneLogisticRegressionMedDrop$ for logistic regression, and the held-out AUC ranges from \trSemoneXGBoostOutAucMin{} to \trSemoneXGBoostOutAucMax. Pooled over all students, the Dropout AUC falls from \trSemoneXGBoostInAuc{} to \trSemoneXGBoostOutAuc{} for XGBoost and from \trSemoneLogisticRegressionInAuc{} to \trSemoneLogisticRegressionOutAuc{} for logistic regression (Table~\ref{tab:transfer}), so here the simpler model transfers better. Section~\ref{sec:upv} shows that this does not carry over to the second university.
+
+Most of the pooled loss comes from the overall level of dropout in a new programme, which the model misjudges. Its mean predicted dropout probability differs from the observed rate by \trSemoneXGBoostCalGap{} on average (\trSemoneLogisticRegressionCalGap{} for logistic regression). Ranking within the programme survives, but the probabilities need recalibrating to the new programme's base rate. In Animation and Multimedia Design, \trZeroAnim\% of students have no curricular units recorded in either semester, including \trZeroGradAnim\% of those who graduated; no other programme has any such records. When the programme is part of the training data, its own students teach the model that these zeros do not signal failure, and when it is held out the zeros are read as failure. It then predicts a mean dropout probability of \trAnimMeanP{} against an observed \trAnimRate{}, and the AUC falls from \trAnimInAuc{} to \trAnimOutAuc. Without this programme, the pooled AUC of XGBoost goes from \trSemoneXGBoostInAucExcl{} to \trSemoneXGBoostOutAucExcl. The same pattern holds after the second semester.
+
+A model trained on other programmes can rank students in a new one. Its probabilities should be recalibrated on that programme's first cohort, and each programme's data recording should be checked before use.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{fig_transfer}
+  \caption{Dropout AUC within each programme after the first semester (XGBoost, programme code removed). Circles: the programme was part of training (repeated CV). Diamonds: the programme was held out. Programmes with fewer than 50 students are omitted from the plot but included in the pooled results.}
+  \label{fig:transfer}
+\end{figure}
+
+\input{generated/tab_transfer}
+
+\FloatBarrier
 \subsection{Replication at a second university (RQ6)}
 \label{sec:upv}
 
 Table~\ref{tab:replication} places the main UCI findings next to the same quantities at UPV, and Table~\ref{tab:upv_stages} gives the UPV results at each prediction point.
 
-The models tie again. After the first semester, \upvSemoneTied{} of the 8 models are not significantly below the best (XGBoost, AUC \upvSemoneXgbAuc), and logistic regression reaches \upvSemoneLrAuc. Only the decision tree, the SVM and LightGBM fall behind. Prediction improves through the year as at UCI, from a Dropout AUC of \upvEnrolBestAuc{} at enrolment to \upvSemoneBestAuc{} after the first semester and \upvYearBestAuc{} at the end of the year (Figure~\ref{fig:universities}a). The second semester matters more here. At UCI the first semester brings \repShareUci\% of the gain over the year, at UPV \repShareUpv\%. Probabilities are again calibrated (ECE \upvYearXgbEce{} at the end of the year). Learning-platform activity changes little. It raises the best AUC by \upvLmsGainSemone{} after the first semester, and at the end of the year the best AUC is \upvYearlmsBestAuc{} with it and \upvYearBestAuc{} without it.
+The models tie again. After the first semester, \upvSemoneTied{} of the 8 models are not significantly below the best (XGBoost, AUC \upvSemoneXgbAuc), and logistic regression reaches \upvSemoneLrAuc. Only the decision tree, the SVM and LightGBM fall behind. Prediction improves through the year as at UCI, from a Dropout AUC of \upvEnrolBestAuc{} at enrolment to \upvSemoneBestAuc{} after the first semester and \upvYearBestAuc{} at the end of the year (Figure~\ref{fig:universities}a). The second semester matters more here than at UCI, since the first semester brings \repShareUpv\% of the gain over the year at UPV and \repShareUci\% at UCI. Probabilities are again calibrated (ECE \upvYearXgbEce{} at the end of the year). Learning-platform activity changes little. It raises the best AUC by \upvLmsGainSemone{} after the first semester, and at the end of the year the best AUC is \upvYearlmsBestAuc{} with it and \upvYearBestAuc{} without it.
 
 Without any first-semester credits, the activity data up to January raise the AUC from \upvEnrolBestAuc{} to \upvLmsonlyBestAuc, a little over half of the rise to \upvSemoneBestAuc{} that the credits give. Resits counted in the credits can account for part of the first-semester gain at most.
 
-With a dropout rate of \upvRate, precision on a fixed-size list is lower than at UCI, and reach is higher. After the first semester, a list of the top 20\% reaches \upvSemoneXgbTopTwentyRPct\% of dropouts, and \upvSemoneXgbTopTwentyP{} of the listed students drop out. At the end of the year these figures are \upvYearXgbTopTwentyRPct\% and \upvYearXgbTopTwentyP. The recall gap of Section~\ref{sec:results} appears in both UPV groupings. With one threshold and a 20\% list at the end of the year, recall is \upvThrYearFulltimeSingleRec{} for full-time students (dropout rate \upvThrFulltimeRate) and \upvThrYearParttimeSingleRec{} for part-time students (\upvThrParttimeRate), and \upvThrYearStandardaccessSingleRec{} for the most common access route (\upvThrStandardaccessRate) against \upvThrYearOtheraccessroutesSingleRec{} for the others (\upvThrOtheraccessroutesRate). Group-specific thresholds bring the pairs to \upvThrYearFulltimeGroupRec{} and \upvThrYearParttimeGroupRec, and to \upvThrYearStandardaccessGroupRec{} and \upvThrYearOtheraccessroutesGroupRec, while overall precision moves from \upvThrYearStudymodeSinglePrec{} to \upvThrYearStudymodeGroupPrec. The correction works differently from UCI, where it mainly raised recall in the low-dropout group. Here most of the change is lower recall in the high-dropout group, and the false-alert rate of part-time students falls from \upvThrYearParttimeSingleFpr{} to \upvThrYearParttimeGroupFpr.
+Dropout is rarer at UPV (rate \upvRate), so a list of fixed size holds fewer dropouts but covers a larger share of them, and precision is lower than at UCI while reach is higher. After the first semester, a list of the top 20\% reaches \upvSemoneXgbTopTwentyRPct\% of dropouts, and \upvSemoneXgbTopTwentyP{} of the listed students drop out. At the end of the year these figures are \upvYearXgbTopTwentyRPct\% and \upvYearXgbTopTwentyP. The recall gap of Section~\ref{sec:results} appears in both UPV groupings. With one threshold and a 20\% list at the end of the year, recall is \upvThrYearFulltimeSingleRec{} for full-time students (dropout rate \upvThrFulltimeRate) and \upvThrYearParttimeSingleRec{} for part-time students (\upvThrParttimeRate), and \upvThrYearStandardaccessSingleRec{} for the most common access route (\upvThrStandardaccessRate) against \upvThrYearOtheraccessroutesSingleRec{} for the others (\upvThrOtheraccessroutesRate). Group-specific thresholds bring the pairs to \upvThrYearFulltimeGroupRec{} and \upvThrYearParttimeGroupRec, and to \upvThrYearStandardaccessGroupRec{} and \upvThrYearOtheraccessroutesGroupRec, while overall precision moves from \upvThrYearStudymodeSinglePrec{} to \upvThrYearStudymodeGroupPrec. The correction works differently from UCI, where it mainly raised recall in the low-dropout group. Here most of the change is lower recall in the high-dropout group, and the false-alert rate of part-time students falls from \upvThrYearParttimeSingleFpr{} to \upvThrYearParttimeGroupFpr.
 
 \input{generated/tab_replication}
 
@@ -314,7 +317,9 @@ XGBoost loses less on unseen degrees and on the 2021 cohort, while logistic regr
 
 \paragraph{What the Enrolled class is.} Reading Enrolled as delayed completion changes the interpretation of the three-class problem. The low F1 for this class means that delay is hard to separate from both dropout and graduation with the available variables, partly because the class contains students on both paths. For an institution, dropout and delay are separate targets. Dropout reaches an AUC of \multiclassXGBoostaucdropout, the delayed class an F1 of only \multiclassXGBoostfenrolled, and delay may need more frequent data, such as term-by-term progress, than two semester summaries provide.
 
-\paragraph{Which model.} In three-class macro F1, 5 of the 8 models are statistically tied, in the binary setting 7 of 8, and at the second university \upvSemoneTied{} of 8 in dropout AUC. Logistic regression is among the tied models in both, has calibrated probabilities and is easy to explain to advisers. Boosted trees give small but consistent AUC gains. With accuracy this close, interpretability and ease of maintenance can decide between them. Tree ensembles are usually strong on tabular data \citep{grinsztajn2022}, yet here their margin over a well-specified linear model is small. When the data shift to a new cohort or degree, neither kind of model was consistently ahead.
+\paragraph{What the replication shows.} The second university differs in country, in how it defines dropout, in its dropout rate (\upvRatePct\% against 32\%) and in the variables it records. The results that hold in both places concern evaluation and use. Models tie, probabilities are calibrated, a first-semester model ranks dropouts well enough to build a short list, and a single threshold misses more dropouts where dropout is rare. Results that depend on the structure of one dataset did not carry over, among them the better transfer of logistic regression and the share of the first-year signal that arrives in the first semester (\repShareUci\% at UCI, \repShareUpv\% at UPV). The delayed class could not be tested, because the second dataset does not record delay.
+
+\paragraph{Which model.} In three-class macro F1, 5 of the 8 models are statistically tied, in the binary setting 7 of 8, and at the second university \upvSemoneTied{} of 8 in Dropout AUC. Logistic regression is among the tied models in both, has calibrated probabilities and is easy to explain to advisers. Boosted trees give small but consistent AUC gains. With accuracy this close, interpretability and ease of maintenance can decide between them. Tree ensembles are usually strong on tabular data \citep{grinsztajn2022}, yet here their margin over a well-specified linear model is small. When the data shift to a new cohort or degree, neither kind of model was consistently ahead.
 
 \paragraph{Using the scores.} For an institution, the most useful output is a ranked list of students. After one semester, a list covering a fifth of the cohort reaches more than half of eventual dropouts with few false alerts, and calibrated probabilities make it possible to choose the list size from the expected number of dropouts. Because a single threshold under-serves groups where dropout is rare, the list should be checked by group, and group-specific thresholds are a cheap correction where equal recall is the goal. At UPV the same correction equalised recall mostly by flagging fewer part-time students, whose false-alert rate fell from \upvThrYearParttimeSingleFpr{} to \upvThrYearParttimeGroupFpr. Accuracy on a new cohort was lower at UPV already for the 2021 entrants, so a deployed model should be refitted as each cohort finishes its first year and recalibrated on a new programme's first term.
 
