@@ -173,12 +173,17 @@ def run(step: Step) -> float:
 
 
 def build_paper() -> None:
-    if not shutil.which("latexmk"):
-        print("latexmk not found: compile paper/main.tex in your LaTeX editor.")
+    """Compile paper/main.tex in place (overwrites paper/main.pdf)."""
+    if shutil.which("latexmk"):
+        cmd = ["latexmk", "-pdf", "-interaction=nonstopmode", "-quiet", "main.tex"]
+    elif shutil.which("tectonic"):   # downloads the LaTeX packages it needs on first use
+        cmd = ["tectonic", "--keep-logs", "main.tex"]
+    else:
+        print("No LaTeX found. Install one with  brew install tectonic  "
+              "(or open paper/main.tex in a LaTeX editor such as Overleaf).")
         return
-    print("\n── paper")
-    subprocess.run(["latexmk", "-pdf", "-interaction=nonstopmode", "-quiet", "main.tex"],
-                   cwd=ROOT / "paper", check=True)
+    print(f"\n── paper ({cmd[0]})")
+    subprocess.run(cmd, cwd=ROOT / "paper", check=True)
     print("✓ paper/main.pdf")
 
 
